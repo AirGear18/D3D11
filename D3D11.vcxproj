@@ -153,9 +153,13 @@
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="Definds.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Input\EventManager.h" />
     <ClInclude Include="Input\inputclass.h" />
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="ModelObject.h" />
+    <ClInclude Include="Object\BaseObject.h" />
+    <ClInclude Include="Object\BaseRenderer.h" />
+    <ClInclude Include="Object\ObjectManager.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Renderer\DeferredBuffers.h" />
     <ClInclude Include="Renderer\DeferredRenderer.h" />
@@ -163,7 +167,6 @@
     <ClInclude Include="Renderer\lightclass.h" />
     <ClInclude Include="Renderer\lightshaderclass.h" />
     <ClInclude Include="Renderer\orthowindowclass.h" />
-    <ClInclude Include="Renderer\Test.h" />
     <ClInclude Include="Renderer\VertexBuffer.h" />
     <ClInclude Include="safe_thread.h" />
     <ClInclude Include="StepTimer.h" />
@@ -174,10 +177,14 @@
     <ClCompile Include="Camera\cameraclass.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Input\EventManager.cpp" />
     <ClCompile Include="Input\inputclass.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="ModelObject.cpp" />
+    <ClCompile Include="Object\BaseObject.cpp" />
+    <ClCompile Include="Object\BaseRenderer.cpp" />
+    <ClCompile Include="Object\ObjectManager.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Renderer\DeferredBuffers.cpp" />
     <ClCompile Include="Renderer\DeferredRenderer.cpp" />
@@ -185,7 +192,6 @@
     <ClCompile Include="Renderer\lightclass.cpp" />
     <ClCompile Include="Renderer\lightshaderclass.cpp" />
     <ClCompile Include="Renderer\orthowindowclass.cpp" />
-    <ClCompile Include="Renderer\Test.cpp" />
     <ClCompile Include="Renderer\VertexBuffer.cpp" />
     <ClCompile Include="Vector4.cpp" />
     <ClCompile Include="XTime.cpp" />

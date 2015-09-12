@@ -21,6 +21,14 @@
 
 #include <thread>
 
+///EventManager
+#include "Input\EventManager.h"
+//ObjectManager
+#include "Object\ObjectManager.h"
+
+//Test Object update and renderer
+#include "Object\BaseRenderer.h"
+
 using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
@@ -83,6 +91,9 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 		MessageBox(window, L"Could not initialize the light shader object.", L"Error", MB_OK);
 	}
 
+	
+	BaseRenderer * temp = new BaseRenderer(1, "Assets/Models/Trex2.obj","Assets/Models/TrexTemp.dds",false,NULL,XMFLOAT3(0,0,0),"Trex2");
+	
 	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
 	// e.g. for 60 FPS fixed timestep update logic, call:
 	/*
@@ -101,8 +112,6 @@ void Game::Tick()
 		Update(m_timer);
 	});
 
-
-	Render();
 }
 
 // Updates the world
@@ -112,7 +121,7 @@ void Game::Update(DX::StepTimer const& timer)
 
 	// TODO: Add your game logic here
 	elapsedTime;
-	
+
 	//Camera update
 	m_Camera->Render();
 
@@ -122,6 +131,38 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		GameRunning = false;
 	}
+	if (m_Input->IsUpPressed())
+	{
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y + (10)*.01, m_Camera->GetPosition().z);
+	}
+	if (m_Input->IsDownPressed())
+	{
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y - (10)*.01, m_Camera->GetPosition().z);
+	}
+	if (m_Input->IsLeftPressed())
+	{
+		m_Camera->SetPosition(m_Camera->GetPosition().x - (10)*.01, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+	}
+	if (m_Input->IsRightPressed())
+	{
+		m_Camera->SetPosition(m_Camera->GetPosition().x + (10)*.01, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+
+	}
+	if (m_Input->IsPgDownPressed())
+	{
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z - (10)*.01);
+
+	}
+	if (m_Input->IsPgUpPressed())
+	{
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*.01);
+
+	}
+
+	//Updated all moveable object that have been added.
+	ObjectManager::GetInstance()->ObjectUpdate(elapsedTime);
+	//	like name says
+	Render();
 }
 
 // Draws the scene
@@ -130,8 +171,6 @@ void Game::Render()
 	// Don't try to render anything before the first Update.
 	if (m_timer.GetFrameCount() == 0)
 		return;
-
-	Clear();
 
 	// TODO: Add your rendering code here
 
@@ -150,15 +189,18 @@ void Game::Clear()
 
 void Game::RenderSceneToTexture()
 {
+	XMMATRIX viewMatrix, projectionMatrix;
 	// Set the render buffers to be the render target.
 	m_DeferredBuffer->SetRenderTargets(DeferredRenderer::GetInstance()->GetDeviceContext());
 
 	// Clear the render buffers.
 	m_DeferredBuffer->ClearRenderTargets(DeferredRenderer::GetInstance()->GetDeviceContext(), 0.2f, 0.0f, 0.0f, 1.0f);
 
+	m_Camera->GetViewMatrix(viewMatrix);
+	DeferredRenderer::GetInstance()->GetProjectionMatrix(projectionMatrix);
 
 	//TODO: Place renderer object here to renderer to buffers
-
+	ObjectManager::GetInstance()->ObjectRenderer(viewMatrix,projectionMatrix,m_DeferredShader);
 
 
 	// Reset the render target back to the original back buffer and not the render buffers anymore.
@@ -173,9 +215,12 @@ void Game::Present()
 {
 	XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
 
+	//
+	RenderSceneToTexture();
+
 	//Clear backBuffer
 	DeferredRenderer::GetInstance()->ClearScene(1, 0, 0, 1);
-	
+
 	//get world mat
 	DeferredRenderer::GetInstance()->GetWorldMatrix(worldMatrix);
 	//get view matrix for quad
@@ -265,7 +310,7 @@ void Game::CreateResources()
 {
 
 
-	
+
 
 	// TODO: Initialize windows-size dependent objects here
 }

@@ -586,12 +586,13 @@ UINT DeferredRenderer::AddIndices(const UINT *_indices, UINT _numIndices)
 	if (LastIndex == 0)
 	{
 		D3D11_BUFFER_DESC indexBufferDesc = { 0 };
-		indexBufferDesc.ByteWidth = sizeof(unsigned int) * _numIndices;
+		indexBufferDesc.ByteWidth = sizeof(UINT) * _numIndices;
 		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 		D3D11_SUBRESOURCE_DATA indexDataDesc = { 0 };
 		indexDataDesc.pSysMem = _indices;
 		LastIndex = _numIndices;
+
 		m_device->CreateBuffer(&indexBufferDesc, &indexDataDesc, &indexBufferPtr);
 
 		return 0;

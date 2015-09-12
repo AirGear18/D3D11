@@ -41,9 +41,14 @@ void DeferredShader::Shutdown()
 	return;
 }
 
-
+//	1: DeviceContext
+//	2: Index Count
+//	3: World Matrix
+//	4: View Matric
+//	5: Projection matrix
+//	6: Texture
 bool DeferredShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix,
-	XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture)
+	XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, int Startlocation)
 {
 	bool result;
 
@@ -56,7 +61,7 @@ bool DeferredShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, 
 	}
 
 	// Now render the prepared buffers with the shader.
-	RenderShader(deviceContext, indexCount);
+	RenderShader(deviceContext, indexCount,Startlocation);
 
 	return true;
 }
@@ -252,7 +257,7 @@ bool DeferredShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMM
 }
 
 
-void DeferredShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
+void DeferredShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount, int Startlocation)
 {
 	// Set the vertex input layout.
 	deviceContext->IASetInputLayout(m_layout);

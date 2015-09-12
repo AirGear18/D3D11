@@ -61,6 +61,9 @@ public:
 	void SetBackBufferRenderTarget();
 	void ResetViewport();
 
+	//Get
+	ID3D11Buffer *GetIndexBuffer(){ return indexBufferPtr; }
+
 	//set
 	UINT AddIndices(const UINT *_indices, UINT _numIndices);
 private:

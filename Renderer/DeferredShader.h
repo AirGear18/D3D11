@@ -20,14 +20,14 @@ public:
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*);
+	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*,int Startlocation);
 
 private:
 	bool InitializeShader(ID3D11Device*, HWND);
 	void ShutdownShader();
 
 	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*);
-	void RenderShader(ID3D11DeviceContext*, int);
+	void RenderShader(ID3D11DeviceContext*, int, int Startlocation);
 
 private:
 	ID3D11VertexShader* m_vertexShader;
