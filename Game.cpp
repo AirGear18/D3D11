@@ -126,34 +126,34 @@ void Game::Update(DX::StepTimer const& timer)
 	m_Camera->Render();
 
 	//check keyboard state if any keys
-	m_Input->Frame();
-	if (m_Input->IsEscapePressed())
+	InputClass::GetInstance()->Frame();
+	if (InputClass::GetInstance()->IsEscapePressed())
 	{
 		GameRunning = false;
 	}
-	if (m_Input->IsUpPressed())
+	if (InputClass::GetInstance()->IsUpPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y + (10)*.01, m_Camera->GetPosition().z);
 	}
-	if (m_Input->IsDownPressed())
+	if (InputClass::GetInstance()->IsDownPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y - (10)*.01, m_Camera->GetPosition().z);
 	}
-	if (m_Input->IsLeftPressed())
+	if (InputClass::GetInstance()->IsLeftPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x - (10)*.01, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
 	}
-	if (m_Input->IsRightPressed())
+	if (InputClass::GetInstance()->IsRightPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x + (10)*.01, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
 
 	}
-	if (m_Input->IsPgDownPressed())
+	if (InputClass::GetInstance()->IsPgDownPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z - (10)*.01);
 
 	}
-	if (m_Input->IsPgUpPressed())
+	if (InputClass::GetInstance()->IsPgUpPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*.01);
 
@@ -294,13 +294,14 @@ void Game::CreateDevice()
 	GetDefaultSize(w, h);
 	DeferredRenderer::GetInstance()->Initialize(w, h, false, m_window, false, SCREEN_DEPTH, SCREEN_NEAR);
 
-	m_Input = new InputClass;
-
-	// Initialize the input object.
-	if (!m_Input->Initialize(hInstance, m_window, w, h))
-	{
-		MessageBox(m_window, L"Could not initialize the input object.", L"Error", MB_OK);
-	}
+	InputClass::GetInstance()->Initialize(hInstance, m_window, w, h);
+	//m_Input = new InputClass;
+	//
+	//// Initialize the input object.
+	//if (!m_Input->Initialize(hInstance, m_window, w, h))
+	//{
+	//	MessageBox(m_window, L"Could not initialize the input object.", L"Error", MB_OK);
+	//}
 
 
 }
@@ -320,7 +321,7 @@ void Game::ShutDown()
 	// TODO: cleanup here
 	//Base clean up
 	DeferredRenderer::GetInstance()->Shutdown();
-	m_Input->Shutdown();
+	InputClass::GetInstance()->Shutdown();
 	m_DeferredBuffer->Shutdown();
 	m_DeferredShader->Shutdown();
 	m_QuadScreen->Shutdown();

@@ -60,7 +60,7 @@ private:
 	HINSTANCE hInstance;
 
 	//input
-	InputClass* m_Input;
+	//InputClass* m_Input;
 	//Cam
 	CameraClass *m_Camera;
 	//renderer
