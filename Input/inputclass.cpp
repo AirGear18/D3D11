@@ -5,11 +5,18 @@
 #include "inputclass.h"
 //#include"cameraclass.h"
 
+
+InputClass* InputClass::GetInstance(void)
+{
+	static InputClass s_Instance;	// stored in global memory once
+	return &s_Instance;
+}
+
 InputClass::InputClass()
 {
-	m_directInput = 0;
-	m_keyboard = 0;
-	m_mouse = 0;
+	//m_directInput = 0;
+	//m_keyboard = 0;
+	//m_mouse = 0;
 }
 
 

@@ -31,6 +31,9 @@
 class InputClass
 {
 public:
+
+	static InputClass * GetInstance();
+
 	InputClass();
 	InputClass(const InputClass&);
 	~InputClass();
@@ -58,9 +61,9 @@ private:
 	void ProcessInput();
 
 private:
-	IDirectInput8* m_directInput;
-	IDirectInputDevice8* m_keyboard;
-	IDirectInputDevice8* m_mouse;
+	IDirectInput8* m_directInput=0;
+	IDirectInputDevice8* m_keyboard=0;
+	IDirectInputDevice8* m_mouse=0;
 
 	unsigned char m_keyboardState[256];
 	DIMOUSESTATE m_mouseState;
@@ -69,8 +72,6 @@ private:
 	int m_mouseX, m_mouseY;
 
 
-
-	//CameraClass *Cam;
 };
 
 #endif
