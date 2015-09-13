@@ -29,6 +29,12 @@
 //Test Object update and renderer
 #include "Object\BaseRenderer.h"
 
+//GameStates
+#include "GameStates\MainMenu.h"
+
+//Debug
+#include "DebugStuff\ShapeDebug.h"
+
 using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
@@ -59,7 +65,7 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	GetDefaultSize(w, h);
 	//deferred buffers set up
 	m_DeferredBuffer = new DeferredBuffers();
-	m_DeferredBuffer->Initialize(DeferredRenderer::GetInstance()->GetDevice(), w, h, SCREEN_DEPTH, SCREEN_NEAR);
+	m_DeferredBuffer->Initialize(DeferredRenderer::GetInstance()->GetDevice(), (int)w, (int)h, SCREEN_DEPTH, SCREEN_NEAR);
 
 	m_DeferredShader = new DeferredShader;
 	// Initialize the deferred shader object.
@@ -70,7 +76,7 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	m_QuadScreen = new OrthoWindowClass;
 	// Initialize the full screen ortho window object.
 
-	if (!m_QuadScreen->Initialize(DeferredRenderer::GetInstance()->GetDevice(), w, h))
+	if (!m_QuadScreen->Initialize(DeferredRenderer::GetInstance()->GetDevice(), (int)w, (int)h))
 	{
 		MessageBox(window, L"Could not initialize the full screen ortho window object.", L"Error", MB_OK);
 	}
@@ -90,10 +96,11 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	{
 		MessageBox(window, L"Could not initialize the light shader object.", L"Error", MB_OK);
 	}
-
-	
 	BaseRenderer * temp = new BaseRenderer(1, "Assets/Models/Trex2.obj","Assets/Models/TrexTemp.dds",false,NULL,XMFLOAT3(0,0,0),"Trex2");
 	
+	ChangeState(MainMenu::GetInstance());
+	ShapeDebug::GetInstance()->Initialize();
+
 	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
 	// e.g. for 60 FPS fixed timestep update logic, call:
 	/*
@@ -109,7 +116,17 @@ void Game::Tick()
 {
 	m_timer.Tick([&]()
 	{
+		if (m_pCurrState->Input() == false)
+		{
+			GameRunning = false;
+		}
+
 		Update(m_timer);
+
+		float elapsedTime = float(m_timer.GetElapsedSeconds());
+		m_pCurrState->Update(elapsedTime);
+		m_pCurrState->Render();
+
 	});
 
 }
@@ -133,29 +150,29 @@ void Game::Update(DX::StepTimer const& timer)
 	}
 	if (InputClass::GetInstance()->IsUpPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y + (10)*.01, m_Camera->GetPosition().z);
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y + (10)*elapsedTime, m_Camera->GetPosition().z);
 	}
 	if (InputClass::GetInstance()->IsDownPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y - (10)*.01, m_Camera->GetPosition().z);
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y - (10)*elapsedTime, m_Camera->GetPosition().z);
 	}
 	if (InputClass::GetInstance()->IsLeftPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x - (10)*.01, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+		m_Camera->SetPosition(m_Camera->GetPosition().x - (10)*elapsedTime, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
 	}
 	if (InputClass::GetInstance()->IsRightPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x + (10)*.01, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+		m_Camera->SetPosition(m_Camera->GetPosition().x + (10)*elapsedTime, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
 
 	}
 	if (InputClass::GetInstance()->IsPgDownPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z - (10)*.01);
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z - (10)*elapsedTime);
 
 	}
 	if (InputClass::GetInstance()->IsPgUpPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*.01);
+		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*elapsedTime);
 
 	}
 
@@ -292,18 +309,9 @@ void Game::CreateDevice()
 	//Basic setup
 	size_t w, h;
 	GetDefaultSize(w, h);
-	DeferredRenderer::GetInstance()->Initialize(w, h, false, m_window, false, SCREEN_DEPTH, SCREEN_NEAR);
+	DeferredRenderer::GetInstance()->Initialize((int)w, (int)h, false, m_window, false, SCREEN_DEPTH, SCREEN_NEAR);
 
-	InputClass::GetInstance()->Initialize(hInstance, m_window, w, h);
-	//m_Input = new InputClass;
-	//
-	//// Initialize the input object.
-	//if (!m_Input->Initialize(hInstance, m_window, w, h))
-	//{
-	//	MessageBox(m_window, L"Could not initialize the input object.", L"Error", MB_OK);
-	//}
-
-
+	InputClass::GetInstance()->Initialize(hInstance, m_window, (int)w, (int)h);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -320,6 +328,7 @@ void Game::ShutDown()
 {
 	// TODO: cleanup here
 	//Base clean up
+	ChangeState(nullptr);
 	DeferredRenderer::GetInstance()->Shutdown();
 	InputClass::GetInstance()->Shutdown();
 	m_DeferredBuffer->Shutdown();
@@ -330,4 +339,18 @@ void Game::ShutDown()
 
 	/////////////////////////
 
+}
+
+void Game::ChangeState(BaseGameState* pNewState)
+{
+	// Exit the old state
+	if (m_pCurrState != nullptr)
+		m_pCurrState->Exit();
+
+	// Store the new state
+	m_pCurrState = pNewState;
+
+	// Enter the new state
+	if (m_pCurrState != nullptr)
+		m_pCurrState->Enter();
 }
