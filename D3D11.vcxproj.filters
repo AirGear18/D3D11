@@ -31,6 +31,12 @@
     <Filter Include="GameObjects">
       <UniqueIdentifier>{2650fc88-e770-4928-9124-df3e0db32855}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameStates">
+      <UniqueIdentifier>{19d2e90c-cb55-4ec1-adfc-aaff75183e1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{736d9d40-c230-4478-be37-966bc6864704}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -99,8 +105,17 @@
     <ClInclude Include="Object\ObjectManager.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Object\BaseRenderer.h">
+    <ClInclude Include="GameStates\BaseGameState.h">
+      <Filter>GameStates</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStates\MainMenu.h">
+      <Filter>GameStates</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugStuff\ShapeDebug.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\BaseRenderer.h">
+      <Filter>GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -164,8 +179,14 @@
     <ClCompile Include="Object\ObjectManager.cpp">
       <Filter>GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="Object\BaseRenderer.cpp">
+    <ClCompile Include="GameStates\MainMenu.cpp">
+      <Filter>GameStates</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugStuff\ShapeDebug.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\BaseRenderer.cpp">
+      <Filter>GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

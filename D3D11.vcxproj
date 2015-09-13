@@ -151,8 +151,11 @@
   <ItemGroup>
     <ClInclude Include="Camera\cameraclass.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="DebugStuff\ShapeDebug.h" />
     <ClInclude Include="Definds.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameStates\BaseGameState.h" />
+    <ClInclude Include="GameStates\MainMenu.h" />
     <ClInclude Include="Input\EventManager.h" />
     <ClInclude Include="Input\inputclass.h" />
     <ClInclude Include="Matrix4.h" />
@@ -176,7 +179,9 @@
   <ItemGroup>
     <ClCompile Include="Camera\cameraclass.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="DebugStuff\ShapeDebug.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameStates\MainMenu.cpp" />
     <ClCompile Include="Input\EventManager.cpp" />
     <ClCompile Include="Input\inputclass.cpp" />
     <ClCompile Include="Main.cpp" />

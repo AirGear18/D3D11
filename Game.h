@@ -13,6 +13,7 @@ class DeferredShader;
 class OrthoWindowClass;
 class LightClass;
 class LightShaderClass;
+class BaseGameState;
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop
 class Game
@@ -46,6 +47,8 @@ public:
 
 	bool GetGameState(){ return GameRunning; }
 
+	void ChangeState(BaseGameState* pNewState);
+
 private:
 
 	void Update(DX::StepTimer const& timer);
@@ -73,6 +76,9 @@ private:
 
 	// Game state
 	DX::StepTimer                                   m_timer;
+
+	// Current Game State
+	BaseGameState*				m_pCurrState = nullptr;
 
 	bool GameRunning;
 };

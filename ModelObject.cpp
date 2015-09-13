@@ -22,11 +22,13 @@ void ModelObject::Shutdown()
 {
 	delete[] vertexList;
 	delete[] indexList;
-
-	m_vertexBuffer->Release();
-	m_indexBuffer->Release();
-	ShadeView->Release();
-	pBB->Release();
+	if (m_vertexBuffer)
+		m_vertexBuffer->Release();
+	//m_indexBuffer->Release();
+	if (ShadeView)
+		ShadeView->Release();
+	if (pBB)
+		pBB->Release();
 }
 
 

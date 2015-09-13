@@ -56,7 +56,7 @@ public:
 	UINT indexCount;
 	UINT StartPoint;
 
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
+	ID3D11Buffer *m_vertexBuffer;
 	ID3D11ShaderResourceView * ShadeView;
 	ID3D11Resource * pBB;
 	void Shutdown();
