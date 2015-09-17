@@ -103,6 +103,8 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	temp = new BaseRenderer(1, "Assets/Models/Trex2.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "Trex2");
 	temp->SetPosition(XMFLOAT3(-10, 0, 0));
 	temp = nullptr;
+	//	Floor/walls
+	temp = new BaseRenderer(1, "Assets/Models/Layout.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "FloorWall");
 
 	ChangeState(MainMenu::GetInstance());
 	ShapeDebug::GetInstance()->Initialize();
