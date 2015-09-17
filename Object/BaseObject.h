@@ -12,6 +12,7 @@ protected:
 		MOVEABLE,
 	};
 	int m_ObjectID;
+	int m_Context_Type=-1;
 	XMFLOAT3 m_Position;
 	XMFLOAT3 m_Rotation;
 
@@ -25,7 +26,7 @@ public:
 	//Sets
 	inline void SetPosition(XMFLOAT3 Tposition) { m_Position = Tposition; }
 	inline void SetRotation(XMFLOAT3 TRotation) { m_Rotation = TRotation; }
-
+	inline void SetContextType(int Type) { m_Context_Type = Type; }
 	int GetObjectType(){ return m_ObjectID; }
 
 	virtual void Update(float DeltaTime);

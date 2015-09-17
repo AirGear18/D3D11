@@ -7,7 +7,10 @@ DeferredShader::DeferredShader()
 {
 	m_vertexShader = 0;
 	m_pixelShader = 0;
-	m_layout = 0;
+	for (size_t i = 0; i < NumLayouts; i++)
+	{
+		m_layout[i] = 0;
+	}
 	m_sampleStateWrap = 0;
 	m_matrixBuffer = 0;
 }
@@ -61,7 +64,7 @@ bool DeferredShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, 
 	}
 
 	// Now render the prepared buffers with the shader.
-	RenderShader(deviceContext, indexCount,Startlocation);
+	RenderShader(deviceContext, indexCount, Startlocation);
 
 	return true;
 }
@@ -120,7 +123,7 @@ bool DeferredShader::InitializeShader(ID3D11Device* device, HWND hwnd)
 
 	// Create the vertex input layout.
 	result = device->CreateInputLayout(polygonLayout, ARRAYSIZE(polygonLayout), DeferredShaderVs, sizeof(DeferredShaderVs),
-		&m_layout);
+		&m_layout[0]);
 	if (FAILED(result))
 	{
 		return false;
@@ -191,10 +194,13 @@ void DeferredShader::ShutdownShader()
 	}
 
 	// Release the layout.
-	if (m_layout)
+	for (size_t i = 0; i < NumLayouts; i++)
 	{
-		m_layout->Release();
-		m_layout = 0;
+		if (m_layout[i])
+		{
+			m_layout[i]->Release();
+			m_layout[i] = 0;
+		}
 	}
 
 	// Release the pixel shader.
@@ -259,9 +265,6 @@ bool DeferredShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMM
 
 void DeferredShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount, int Startlocation)
 {
-	// Set the vertex input layout.
-	deviceContext->IASetInputLayout(m_layout);
-
 	// Set the vertex and pixel shaders that will be used to render.
 	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
 	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
@@ -273,4 +276,16 @@ void DeferredShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexC
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 
 	return;
+}
+
+void DeferredShader::SetInputLayout(ID3D11DeviceContext* deviceContext, int LayoutType)
+{
+	switch (LayoutType)
+	{
+	case 0:
+		deviceContext->IASetInputLayout(m_layout[LayoutType]);
+		break;
+	default:
+		break;
+	}
 }
