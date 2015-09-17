@@ -18,20 +18,25 @@ BaseRenderer::BaseRenderer(int ObjectType,const char *FilePath, const char * DDS
 	m_ObjectID = ObjectType;
 	
 	ObjectManager::GetInstance()->AddObject(this);
-	
+
 	m_WorldMatrix = XMMatrixIdentity();
 	m_Position = XMFLOAT3(0, 0, 0);
+	m_Rotation = XMFLOAT3(0, 0, 0);
 }
 
 
 BaseRenderer::~BaseRenderer()
 {
-	m_Model.Shutdown();
+
 }
 
 void BaseRenderer::Update(float DeltaTime)
 {
-	m_WorldMatrix = XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
+	m_Rotation.y += DeltaTime;
+	m_WorldMatrix = XMMatrixRotationY(m_Rotation.y);
+	m_WorldMatrix *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
+	
+
 }
 void BaseRenderer::Renderer(XMMATRIX& ViewMatrix, XMMATRIX&projectionMatrix, DeferredShader * def)
 {

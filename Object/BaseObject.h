@@ -17,7 +17,7 @@ protected:
 
 public:
 	BaseObject();
-	~BaseObject();
+	virtual ~BaseObject();
 
 	//Get
 	inline XMFLOAT3 GetPosition() { return m_Position; }

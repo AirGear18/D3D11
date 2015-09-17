@@ -321,8 +321,6 @@ bool ModelObject::InitializeBuffers(ID3D11Device* device)
 		return false;
 	}
 
-
-
 	// Load the vertex array and index array with data.
 	for (i = 0; i < vertexCount; i++)
 	{
@@ -350,26 +348,6 @@ bool ModelObject::InitializeBuffers(ID3D11Device* device)
 	{
 		return false;
 	}
-
-	//// Set up the description of the static index buffer.
-	//indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	//indexBufferDesc.ByteWidth = sizeof(UINT) * indexCount;
-	//indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	//indexBufferDesc.CPUAccessFlags = 0;
-	//indexBufferDesc.MiscFlags = 0;
-	//indexBufferDesc.StructureByteStride = 0;
-
-	//// Give the subresource structure a pointer to the index data.
-	//indexData.pSysMem = indexList;
-	//indexData.SysMemPitch = 0;
-	//indexData.SysMemSlicePitch = 0;
-
-	//// Create the index buffer.
-	//result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
 
 	// Release the arrays now that the vertex and index buffers have been created and loaded.
 	delete[] vertices;

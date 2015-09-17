@@ -96,8 +96,14 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	{
 		MessageBox(window, L"Could not initialize the light shader object.", L"Error", MB_OK);
 	}
-	BaseRenderer * temp = new BaseRenderer(1, "Assets/Models/Trex2.obj","Assets/Models/TrexTemp.dds",false,NULL,XMFLOAT3(0,0,0),"Trex2");
-	
+
+	BaseRenderer * temp = new BaseRenderer(1, "Assets/Models/Trex2.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "Trex2");
+	temp->SetPosition(XMFLOAT3(10, 0, 0));
+	temp = nullptr;
+	temp = new BaseRenderer(1, "Assets/Models/Trex2.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "Trex2");
+	temp->SetPosition(XMFLOAT3(-10, 0, 0));
+	temp = nullptr;
+
 	ChangeState(MainMenu::GetInstance());
 	ShapeDebug::GetInstance()->Initialize();
 
@@ -126,7 +132,7 @@ void Game::Tick()
 		float elapsedTime = float(m_timer.GetElapsedSeconds());
 		m_pCurrState->Update(elapsedTime);
 		m_pCurrState->Render();
-
+		int x = m_timer.GetFramesPerSecond();
 	});
 
 }
@@ -217,7 +223,7 @@ void Game::RenderSceneToTexture()
 	DeferredRenderer::GetInstance()->GetProjectionMatrix(projectionMatrix);
 
 	//TODO: Place renderer object here to renderer to buffers
-	ObjectManager::GetInstance()->ObjectRenderer(viewMatrix,projectionMatrix,m_DeferredShader);
+	ObjectManager::GetInstance()->ObjectRenderer(viewMatrix, projectionMatrix, m_DeferredShader);
 
 
 	// Reset the render target back to the original back buffer and not the render buffers anymore.
@@ -329,6 +335,7 @@ void Game::ShutDown()
 	// TODO: cleanup here
 	//Base clean up
 	ChangeState(nullptr);
+	ObjectManager::GetInstance()->ShutDown();
 	DeferredRenderer::GetInstance()->Shutdown();
 	InputClass::GetInstance()->Shutdown();
 	m_DeferredBuffer->Shutdown();

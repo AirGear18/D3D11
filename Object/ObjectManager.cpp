@@ -16,7 +16,7 @@ ObjectManager::ObjectManager()
 
 ObjectManager::~ObjectManager()
 {
-	ShutDown();
+	//ShutDown();
 }
 
 void ObjectManager::ShutDown()
@@ -24,7 +24,7 @@ void ObjectManager::ShutDown()
 	map<BaseObject*, BaseObject*>::iterator it;
 	for (it = MoveableObjects.begin(); it != MoveableObjects.end(); it++)
 	{
-		delete it->first;
+		delete it->second;
 	}
 
 	for (it = StaticObjects.begin(); it != StaticObjects.end(); it++)
@@ -63,12 +63,14 @@ void ObjectManager::RemoveObject(BaseObject*Object)
 	case 0:
 	{
 		StaticObjects.erase(Object);
+		delete Object;
 	}
 	break;
 	//Moveable
 	case 1:
 	{
 		MoveableObjects.erase(Object);
+		delete Object;
 	}
 	default:
 		break;
@@ -83,16 +85,16 @@ void ObjectManager::ObjectUpdate(float DeltaTime)
 		it->second->Update(DeltaTime);
 	}
 }
-void ObjectManager::ObjectRenderer(XMMATRIX& view, XMMATRIX& projection,DeferredShader* Def)
+void ObjectManager::ObjectRenderer(XMMATRIX& view, XMMATRIX& projection, DeferredShader* Def)
 {
 	map<BaseObject*, BaseObject*>::iterator it;
 	for (it = MoveableObjects.begin(); it != MoveableObjects.end(); it++)
 	{
-		it->second->Renderer(view, projection,Def);
+		it->second->Renderer(view, projection, Def);
 	}
-	
+
 	for (it = StaticObjects.begin(); it != StaticObjects.end(); it++)
 	{
-		it->second->Renderer(view, projection,Def);
+		it->second->Renderer(view, projection, Def);
 	}
 }
