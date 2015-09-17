@@ -1,6 +1,8 @@
 #include "../pch.h"
 #include "ObjectManager.h"
 #include "BaseObject.h"
+#include "../Renderer/DeferredShader.h"
+#include "../Renderer/DeferredRenderer.h"
 
 //SignleTon
 ObjectManager* ObjectManager::GetInstance()
@@ -21,15 +23,15 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::ShutDown()
 {
-	map<BaseObject*, BaseObject*>::iterator it;
+	list<BaseObject*>::iterator it;
 	for (it = MoveableObjects.begin(); it != MoveableObjects.end(); it++)
 	{
-		delete it->second;
+		delete (*it);
 	}
 
 	for (it = StaticObjects.begin(); it != StaticObjects.end(); it++)
 	{
-		delete it->first;
+		delete (*it);
 	}
 }
 
@@ -39,16 +41,12 @@ void ObjectManager::AddObject(BaseObject*Object)
 	{
 		//Static
 	case 0:
-	{
-		StaticObjects[Object] = Object;
-	}
-	break;
-	//Moveable
+		StaticObjects.push_back(Object);
+		break;
+		//Moveable
 	case 1:
-	{
-		MoveableObjects[Object] = Object;
-	}
-	break;
+		MoveableObjects.push_back(Object);
+		break;
 
 	default:
 		break;
@@ -62,14 +60,14 @@ void ObjectManager::RemoveObject(BaseObject*Object)
 		//Static
 	case 0:
 	{
-		StaticObjects.erase(Object);
+		StaticObjects.remove(Object);
 		delete Object;
 	}
 	break;
 	//Moveable
 	case 1:
 	{
-		MoveableObjects.erase(Object);
+		MoveableObjects.remove(Object);
 		delete Object;
 	}
 	default:
@@ -79,22 +77,35 @@ void ObjectManager::RemoveObject(BaseObject*Object)
 
 void ObjectManager::ObjectUpdate(float DeltaTime)
 {
-	map<BaseObject*, BaseObject*>::iterator it;
+	list<BaseObject*>::iterator it;
 	for (it = MoveableObjects.begin(); it != MoveableObjects.end(); it++)
 	{
-		it->second->Update(DeltaTime);
+		(*it)->Update(DeltaTime);
 	}
 }
 void ObjectManager::ObjectRenderer(XMMATRIX& view, XMMATRIX& projection, DeferredShader* Def)
 {
-	map<BaseObject*, BaseObject*>::iterator it;
-	for (it = MoveableObjects.begin(); it != MoveableObjects.end(); it++)
+	list<BaseObject*>::const_iterator it;
+	for (size_t i = 0; i < SORTNUMLIST; i++)
 	{
-		it->second->Renderer(view, projection, Def);
+		Def->SetInputLayout(DeferredRenderer::GetInstance()->GetDeviceContext(), i);
+		for (it = SortListContext[i].begin(); it != SortListContext[i].end(); it++)
+		{
+			(*it)->Renderer(view, projection, Def);
+		}
 	}
-
-	for (it = StaticObjects.begin(); it != StaticObjects.end(); it++)
+}
+void ObjectManager::AddToContextListSort(int Type, BaseObject*object)
+{
+	switch (Type)
 	{
-		it->second->Renderer(view, projection, Def);
+	case Posnormuv:
+		SortListContext[Type].push_back(object);
+		break;
+	case poscolor:
+		SortListContext[Type].push_back(object);
+		break;
+	default:
+		break;
 	}
 }

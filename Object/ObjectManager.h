@@ -1,12 +1,18 @@
 #pragma once
 #include <map>
-
+#include <vector>
+#include <list>
 class DeferredShader;
 class BaseObject;
+
+const int SORTNUMLIST = 3;
+
 class ObjectManager
 {
-	std::map<BaseObject*, BaseObject*> StaticObjects;
-	std::map<BaseObject*, BaseObject*> MoveableObjects;
+	std::list<BaseObject*>  StaticObjects;
+	std::list<BaseObject*>  MoveableObjects;
+
+	list<BaseObject*> SortListContext[SORTNUMLIST];
 
 public:
 	ObjectManager();
@@ -15,6 +21,7 @@ public:
 
 	//functions
 	void AddObject(BaseObject*);
+	void AddToContextListSort(int Type, BaseObject*object);
 	void RemoveObject(BaseObject*);
 	void ObjectUpdate(float DeltaTime);
 	void ObjectRenderer(DirectX::XMMATRIX& view, DirectX::XMMATRIX& projection,DeferredShader * Def);
@@ -22,8 +29,8 @@ public:
 	void ShutDown();
 
 	//gets
-	std::map<BaseObject*, BaseObject*> GetStaticObject(){ return StaticObjects; }
-	std::map<BaseObject*, BaseObject*> GetMoveableObjects(){ return MoveableObjects; }
+	std::list<BaseObject*>  GetStaticObject(){ return StaticObjects; }
+	std::list<BaseObject*>  GetMoveableObjects(){ return MoveableObjects; }
 
 };
 

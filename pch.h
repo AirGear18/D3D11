@@ -48,3 +48,8 @@ struct VertexInputType
 	DirectX::XMFLOAT2 tex;
 	DirectX::XMFLOAT3 normal;
 };
+
+enum ContextType
+{
+	Posnormuv,poscolor,
+};

@@ -99,12 +99,18 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 
 	BaseRenderer * temp = new BaseRenderer(1, "Assets/Models/Trex2.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "Trex2");
 	temp->SetPosition(XMFLOAT3(10, 0, 0));
+	temp->SetContextType(0);
+	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
 	temp = nullptr;
+
 	temp = new BaseRenderer(1, "Assets/Models/Trex2.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "Trex2");
 	temp->SetPosition(XMFLOAT3(-10, 0, 0));
+	temp->SetContextType(0);
+	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
 	temp = nullptr;
 	//	Floor/walls
 	temp = new BaseRenderer(1, "Assets/Models/Layout.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "FloorWall");
+	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
 
 	ChangeState(MainMenu::GetInstance());
 	ShapeDebug::GetInstance()->Initialize();
