@@ -28,12 +28,21 @@ public:
 
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
-
+	void SetupViewMat();
 	void Render();
 	void GetViewMatrix(XMMATRIX&);
 
 	void RenderBaseViewMatrix();
 	void GetBaseViewMatrix(XMMATRIX&);
+
+	void translationlocalX(float);
+	void translationlocalY(float);
+	void translationlocalZ(float);
+	void translationlocal(XMFLOAT3);
+
+	void  translationGlobalX(float);
+	void  translationGlobalY(float);
+	void  translationGlobalZ(float);
 
 private:
 	float m_positionX, m_positionY, m_positionZ;

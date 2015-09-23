@@ -349,7 +349,12 @@ bool InputClass::IsPgDownPressed()
 	return false;
 }
 
-//void InputClass::RefToCam(CameraClass*TheCam)
-//{
-//	Cam = TheCam;
-//}
+bool InputClass::IsSpaceBarPressed()
+{
+	if (m_keyboardState[DIK_SPACE] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}

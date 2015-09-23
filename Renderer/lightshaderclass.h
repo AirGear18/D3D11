@@ -33,8 +33,9 @@ private:
 
 	struct LightBufferType
 	{
-		XMFLOAT3 lightDirection;
-		float padding;
+		XMFLOAT4 lightDirection;
+		XMFLOAT4 m_ambientColor;
+		XMFLOAT4 m_diffuseColor;
 	};
 
 public:
@@ -44,13 +45,13 @@ public:
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*, XMFLOAT3);
+	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4 ambientColor, XMFLOAT4 diffuseColor);
 
 private:
 	bool InitializeShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
 	void ShutdownShader();
 
-	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*, XMFLOAT3);
+	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4 ambientColor, XMFLOAT4 diffuseColor);
 	void RenderShader(ID3D11DeviceContext*, int);
 
 private:

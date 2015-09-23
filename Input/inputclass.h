@@ -53,6 +53,7 @@ public:
 	bool IsZPressed();
 	bool IsPgUpPressed();
 	bool IsPgDownPressed();
+	bool IsSpaceBarPressed();
 	//void RefToCam(CameraClass*);
 
 private:

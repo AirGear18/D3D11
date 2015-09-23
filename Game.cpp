@@ -11,6 +11,7 @@
 #include "Renderer\orthowindowclass.h"
 #include "Renderer\lightclass.h"
 #include "Renderer\lightshaderclass.h"
+#include "Renderer\SkyBox.h"
 
 //Model loader - Jordans loader
 #include "ModelObject.h"
@@ -58,7 +59,7 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 
 	// Set the initial position of the camera and build the matrices needed for rendering.
 	m_Camera->SetPosition(0.0f, 0.0f, -50);
-	m_Camera->Render();
+	m_Camera->SetupViewMat();
 	m_Camera->RenderBaseViewMatrix();
 
 	size_t w, h;
@@ -86,8 +87,9 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	m_Light = new LightClass;
 
 	// Initialize the light object.
-	m_Light->SetDiffuseColor(255.0f, 255.0f, 255.0f, 255.0f);
+	m_Light->SetDiffuseColor(1,1, 1, 1);
 	m_Light->SetDirection(0.0f, -1.0f, 0.0f);
+	m_Light->SetAmbientColor(1, 1, 1, 1);
 
 	m_LightShader = new LightShaderClass;
 
@@ -109,12 +111,13 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
 	temp = nullptr;
 	//	Floor/walls
-	temp = new BaseRenderer(1, "Assets/Models/Layout.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "FloorWall");
+	temp = new BaseRenderer(0, "Assets/Models/Layout.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "FloorWall");
 	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
 
 	ChangeState(MainMenu::GetInstance());
 	ShapeDebug::GetInstance()->Initialize();
 
+	m_SkyBox = new SkyBox();
 	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
 	// e.g. for 60 FPS fixed timestep update logic, call:
 	/*
@@ -151,10 +154,10 @@ void Game::Update(DX::StepTimer const& timer)
 	float elapsedTime = float(timer.GetElapsedSeconds());
 
 	// TODO: Add your game logic here
-	elapsedTime;
-
 	//Camera update
 	m_Camera->Render();
+
+
 
 	//check keyboard state if any keys
 	InputClass::GetInstance()->Frame();
@@ -162,33 +165,31 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		GameRunning = false;
 	}
-	if (InputClass::GetInstance()->IsUpPressed())
+	if (InputClass::GetInstance()->IsPgUpPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y + (10)*elapsedTime, m_Camera->GetPosition().z);
 	}
-	if (InputClass::GetInstance()->IsDownPressed())
+	if (InputClass::GetInstance()->IsPgDownPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y - (10)*elapsedTime, m_Camera->GetPosition().z);
 	}
 	if (InputClass::GetInstance()->IsLeftPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x - (10)*elapsedTime, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+		m_Camera->SetRotation(m_Camera->GetRotation().x, m_Camera->GetRotation().y - (1)*elapsedTime, m_Camera->GetRotation().z);
 	}
 	if (InputClass::GetInstance()->IsRightPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x + (10)*elapsedTime, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-
+		m_Camera->SetRotation(m_Camera->GetRotation().x, m_Camera->GetRotation().y + (1)*elapsedTime, m_Camera->GetRotation().z);
 	}
-	if (InputClass::GetInstance()->IsPgDownPressed())
+	if (InputClass::GetInstance()->IsDownPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z - (10)*elapsedTime);
-
 	}
-	if (InputClass::GetInstance()->IsPgUpPressed())
+	if (InputClass::GetInstance()->IsUpPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*elapsedTime);
-
 	}
+
 
 	//Updated all moveable object that have been added.
 	ObjectManager::GetInstance()->ObjectUpdate(elapsedTime);
@@ -217,7 +218,7 @@ void Game::Clear()
 	//m_d3dContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
 }
 
-
+//This where all the stuff get renderer but you dont see it yet.
 void Game::RenderSceneToTexture()
 {
 	XMMATRIX viewMatrix, projectionMatrix;
@@ -231,6 +232,11 @@ void Game::RenderSceneToTexture()
 	DeferredRenderer::GetInstance()->GetProjectionMatrix(projectionMatrix);
 
 	//TODO: Place renderer object here to renderer to buffers
+
+	//Rendere SKyBox first.
+	m_SkyBox->Renderer(viewMatrix, projectionMatrix, m_DeferredShader);
+
+	//Loops throguh all game objects
 	ObjectManager::GetInstance()->ObjectRenderer(viewMatrix, projectionMatrix, m_DeferredShader);
 
 
@@ -270,7 +276,7 @@ void Game::Present()
 	// Render the full screen ortho window using the deferred light shader and the render buffers.
 	m_LightShader->Render(DeferredRenderer::GetInstance()->GetDeviceContext(), m_QuadScreen->GetIndexCount(), worldMatrix, baseViewMatrix, orthoMatrix,
 		m_DeferredBuffer->GetShaderResourceView(0), m_DeferredBuffer->GetShaderResourceView(1),
-		m_Light->GetDirection());
+		m_Light->GetDirection(),m_Light->GetAmbientColor(),m_Light->GetDiffuseColor());
 
 	// Turn the Z buffer back on now that all 2D rendering has completed.
 	DeferredRenderer::GetInstance()->TurnZBufferOn();
@@ -351,7 +357,7 @@ void Game::ShutDown()
 	m_QuadScreen->Shutdown();
 	m_LightShader->Shutdown();
 	delete m_Light;
-
+	delete m_SkyBox;
 	/////////////////////////
 
 }

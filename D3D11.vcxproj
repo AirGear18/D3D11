@@ -164,13 +164,17 @@
     <ClInclude Include="Object\BaseRenderer.h" />
     <ClInclude Include="Object\ObjectManager.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PlayerInfo\Player.h" />
     <ClInclude Include="Renderer\DeferredBuffers.h" />
     <ClInclude Include="Renderer\DeferredRenderer.h" />
     <ClInclude Include="Renderer\DeferredShader.h" />
     <ClInclude Include="Renderer\lightclass.h" />
     <ClInclude Include="Renderer\lightshaderclass.h" />
     <ClInclude Include="Renderer\orthowindowclass.h" />
+    <ClInclude Include="Renderer\PointLight.h" />
+    <ClInclude Include="Renderer\SkyBox.h" />
     <ClInclude Include="Renderer\VertexBuffer.h" />
+    <ClInclude Include="Renderer\VertexBufferManager.h" />
     <ClInclude Include="safe_thread.h" />
     <ClInclude Include="StepTimer.h" />
     <ClInclude Include="Vector4.h" />
@@ -191,13 +195,17 @@
     <ClCompile Include="Object\BaseRenderer.cpp" />
     <ClCompile Include="Object\ObjectManager.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="PlayerInfo\Player.cpp" />
     <ClCompile Include="Renderer\DeferredBuffers.cpp" />
     <ClCompile Include="Renderer\DeferredRenderer.cpp" />
     <ClCompile Include="Renderer\DeferredShader.cpp" />
     <ClCompile Include="Renderer\lightclass.cpp" />
     <ClCompile Include="Renderer\lightshaderclass.cpp" />
     <ClCompile Include="Renderer\orthowindowclass.cpp" />
+    <ClCompile Include="Renderer\PointLight.cpp" />
+    <ClCompile Include="Renderer\SkyBox.cpp" />
     <ClCompile Include="Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="Renderer\VertexBufferManager.cpp" />
     <ClCompile Include="Vector4.cpp" />
     <ClCompile Include="XTime.cpp" />
   </ItemGroup>
@@ -236,6 +244,36 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).csh</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\PointLight_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).csh</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\PointLight_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).csh</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="SkyBox_PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).csh</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="SkyBox_VS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename)</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).csh</HeaderFileOutput>
     </FxCompile>

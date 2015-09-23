@@ -37,6 +37,9 @@
     <Filter Include="Debug">
       <UniqueIdentifier>{736d9d40-c230-4478-be37-966bc6864704}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlayerInfo">
+      <UniqueIdentifier>{b3cb2748-e642-4a27-bac5-0a913fc67d89}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -117,6 +120,18 @@
     <ClInclude Include="Object\BaseRenderer.h">
       <Filter>GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerInfo\Player.h">
+      <Filter>PlayerInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\PointLight.h">
+      <Filter>Renderer\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\VertexBufferManager.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -188,6 +203,18 @@
     <ClCompile Include="Object\BaseRenderer.cpp">
       <Filter>GameObjects</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerInfo\Player.cpp">
+      <Filter>PlayerInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\SkyBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\PointLight.cpp">
+      <Filter>Renderer\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\VertexBufferManager.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -215,6 +242,18 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\DirectionalLightVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyBox_VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyBox_PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PointLight_PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PointLight_VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
