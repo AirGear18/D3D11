@@ -2,6 +2,8 @@
 #include "DeferredShader.h"
 #include "../DeferredShaderPS.csh"
 #include "../DeferredShaderVs.csh"
+#include "../SkyBox_VS.csh"
+#include "../SkyBox_PS.csh"
 
 DeferredShader::DeferredShader()
 {
@@ -92,6 +94,20 @@ bool DeferredShader::InitializeShader(ID3D11Device* device, HWND hwnd)
 	{
 		return false;
 	}
+	
+	//create the  vertex shader for skybox
+	result = device->CreateVertexShader(SkyBox_VS, sizeof(SkyBox_VS), NULL, &m_vertexShaderSkyBox);
+	if (FAILED(result))
+	{
+		return false;
+	}
+	// Create Pixel shader for skybox
+	result = device->CreatePixelShader(SkyBox_PS, sizeof(SkyBox_PS), NULL, &m_pixelShaderSkyBox);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 
 	// Create the vertex input layout description.
 	polygonLayout[0].SemanticName = "POSITION";
@@ -128,6 +144,10 @@ bool DeferredShader::InitializeShader(ID3D11Device* device, HWND hwnd)
 	{
 		return false;
 	}
+
+
+
+
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
 	//vertexShaderBuffer->Release();
@@ -216,6 +236,11 @@ void DeferredShader::ShutdownShader()
 		m_vertexShader->Release();
 		m_vertexShader = 0;
 	}
+
+	if (m_vertexShaderSkyBox)
+		m_vertexShaderSkyBox->Release();
+	if (m_pixelShaderSkyBox)
+		m_pixelShaderSkyBox->Release();
 	return;
 }
 
@@ -273,7 +298,7 @@ void DeferredShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexC
 	deviceContext->PSSetSamplers(0, 1, &m_sampleStateWrap);
 
 	// Render the geometry.
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+	deviceContext->DrawIndexed(indexCount, Startlocation, 0);
 
 	return;
 }
@@ -288,4 +313,31 @@ void DeferredShader::SetInputLayout(ID3D11DeviceContext* deviceContext, int Layo
 	default:
 		break;
 	}
+}
+
+bool DeferredShader::RenderSkyBox(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix,
+	XMMATRIX& projectionMatrix, ID3D11ShaderResourceView* texture, int Startlocation)
+{
+	bool result;
+
+
+	// Set the shader parameters that it will use for rendering.
+	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now render the prepared buffers with the shader.
+	// Set the vertex and pixel shaders that will be used to render.
+	deviceContext->VSSetShader(m_vertexShaderSkyBox, NULL, 0);
+	deviceContext->PSSetShader(m_pixelShaderSkyBox, NULL, 0);
+
+	// Set the sampler states in the pixel shader.
+	deviceContext->PSSetSamplers(0, 1, &m_sampleStateWrap);
+
+	// Render the geometry.
+	deviceContext->DrawIndexed(indexCount, Startlocation, 0);
+
+	return true;
 }

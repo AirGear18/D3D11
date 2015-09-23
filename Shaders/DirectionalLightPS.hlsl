@@ -1,8 +1,3 @@
-//float4 main() : SV_TARGET
-//{
-//	return float4(1.0f, 1.0f, 1.0f, 1.0f);
-//}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: light.ps
@@ -27,8 +22,9 @@ SamplerState SampleTypePoint : register(s0);
 //////////////////////
 cbuffer LightBuffer : register(b0)
 {
-	float3 lightDirection;
-	float padding;
+	float4 lightDirection;
+	float4 m_ambientColor;
+	float4 m_diffuseColor;
 };
 
 
@@ -47,12 +43,9 @@ struct PixelInputType
 ////////////////////////////////////////////////////////////////////////////////
 float4 main(PixelInputType input) : SV_TARGET
 {
-	float4 colors;
-	float4 normals;
+	float4 colors, normals, ambientColor;
 	float3 lightDir;
-	float lightIntensity;
-	float4 outputColor;
-
+	float nDotL, lightIntensity;
 
 	// Sample the colors from the color render texture using the point sampler at this texture coordinate location.
 	colors = colorTexture.Sample(SampleTypePoint, input.tex);
@@ -61,12 +54,17 @@ float4 main(PixelInputType input) : SV_TARGET
 	normals = normalTexture.Sample(SampleTypePoint, input.tex);
 	normals = (normals * 2) - 1;
 	// Invert the light direction for calculations.
-	lightDir = -lightDirection;
+	//lightDir = -lightDirection;
+	nDotL = saturate(dot(normals, -lightDirection));
+	colors = float4(nDotL * colors.xyz*m_diffuseColor.xyz, 1);
+
 	// Calculate the amount of light on this pixel.
-	lightIntensity = saturate(dot(normals.xyz, lightDir));
+	//lightIntensity = saturate(dot(normals.xyz, lightDir));
 
 	// Determine the final amount of diffuse color based on the color of the pixel combined with the light intensity.
-	outputColor = saturate(colors * lightIntensity);
+	//outputColor = saturate(colors * lightIntensity);
 
-	return outputColor;
+	ambientColor = float4((m_ambientColor.xyz *colors.xyz), 1);
+
+	return ambientColor *(colors);
 }

@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include "Renderer\DeferredRenderer.h"
+#include "Renderer\VertexBufferManager.h"
 #include "Definds.h"
 #include "DDSTextureLoader.h"
 //#include <string.h>
@@ -12,6 +13,7 @@ using namespace std;
 ModelObject::ModelObject()
 {
 	vertexList = 0;
+	indexList = 0;
 }
 
 ModelObject::~ModelObject()
@@ -20,11 +22,10 @@ ModelObject::~ModelObject()
 }
 void ModelObject::Shutdown()
 {
-	delete[] vertexList;
-	delete[] indexList;
-	if (m_vertexBuffer)
-		m_vertexBuffer->Release();
-	//m_indexBuffer->Release();
+	if (vertexList)
+		delete[] vertexList;
+	if (indexList)
+		delete[] indexList;
 	if (ShadeView)
 		ShadeView->Release();
 	if (pBB)
@@ -55,7 +56,15 @@ bool ModelObject::LoadObject(const char* filePath, const char *FileName, const c
 
 	ifstream infile(BinaryFilePath.c_str());
 
-	if (!infile.good())
+	if (VertexBufferManager::GetInstance()->CheckVertexBuffers(filePath) != NULL)
+	{
+		m_vertexBuffer = VertexBufferManager::GetInstance()->CheckVertexBuffers(filePath);
+		indexCount = VertexBufferManager::GetInstance()->GetIndexCount(filePath);
+		StartPoint = VertexBufferManager::GetInstance()->GetIndexStartPos(filePath);
+
+		LoadTexture(string(DDSLocation));
+	}
+	else if (!infile.good())
 	{
 		if (!filePath)
 			return false;
@@ -255,6 +264,8 @@ bool ModelObject::LoadObject(const char* filePath, const char *FileName, const c
 		SaveObjectBinary(BinaryFilePath.c_str());
 		InitializeBuffers(DeferredRenderer::GetInstance()->GetDevice());
 		LoadTexture(string(DDSLocation));
+
+		VertexBufferManager::GetInstance()->AddVertexBuffers(filePath, m_vertexBuffer, indexCount, StartPoint);
 	}
 	else
 	{
@@ -263,6 +274,7 @@ bool ModelObject::LoadObject(const char* filePath, const char *FileName, const c
 		StartPoint = DeferredRenderer::GetInstance()->AddIndices(indexList, indexCount);
 		InitializeBuffers(DeferredRenderer::GetInstance()->GetDevice());
 		LoadTexture(string(DDSLocation));
+		VertexBufferManager::GetInstance()->AddVertexBuffers(filePath, m_vertexBuffer, indexCount, StartPoint);
 	}
 
 	// Clean up memory leak

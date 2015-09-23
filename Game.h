@@ -14,6 +14,7 @@ class OrthoWindowClass;
 class LightClass;
 class LightShaderClass;
 class BaseGameState;
+class SkyBox;
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop
 class Game
@@ -73,6 +74,7 @@ private:
 	LightClass *m_Light;
 	LightShaderClass *m_LightShader;
 
+	SkyBox * m_SkyBox;
 
 	// Game state
 	DX::StepTimer                                   m_timer;

@@ -32,10 +32,16 @@ BaseRenderer::~BaseRenderer()
 
 void BaseRenderer::Update(float DeltaTime)
 {
-	m_Rotation.y += DeltaTime;
-	m_WorldMatrix = XMMatrixRotationY(m_Rotation.y);
-	m_WorldMatrix *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-	
+	if (m_ObjectID == 1)
+	{
+		m_Rotation.y += DeltaTime;
+		m_WorldMatrix = XMMatrixRotationY(m_Rotation.y);
+		m_WorldMatrix *= XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
+	}
+	else
+	{
+		m_WorldMatrix = XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
+	}
 
 }
 void BaseRenderer::Renderer(XMMATRIX& ViewMatrix, XMMATRIX&projectionMatrix, DeferredShader * def)

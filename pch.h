@@ -28,7 +28,7 @@ const float SCREEN_NEAR = 0.1f;
 #define PI 3.14159f
 
 using namespace std;
-
+using namespace DirectX;
 namespace DX
 {
     inline void ThrowIfFailed(HRESULT hr)
