@@ -110,6 +110,18 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	temp->SetContextType(0);
 	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
 	temp = nullptr;
+	//for (size_t i = 0; i < 10; i++)
+	//{
+	//	for (size_t j = 0; j < 50; j++)
+	//	{
+	//		temp = new BaseRenderer(1, "Assets/Models/Trex2.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "Trex2");
+	//		temp->SetPosition(XMFLOAT3(i*2, 0, j*5));
+	//		temp->SetContextType(0);
+	//		ObjectManager::GetInstance()->AddToContextListSort(0, temp);
+	//		temp = nullptr;
+	//	}
+	//}
+
 	//	Floor/walls
 	temp = new BaseRenderer(0, "Assets/Models/Layout.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "FloorWall");
 	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
