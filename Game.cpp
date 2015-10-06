@@ -12,6 +12,9 @@
 #include "Renderer\lightclass.h"
 #include "Renderer\lightshaderclass.h"
 #include "Renderer\SkyBox.h"
+//PointLight
+#include "Renderer\PointLight.h"
+#include "Renderer\LightManager.h"
 
 //Model loader - Jordans loader
 #include "ModelObject.h"
@@ -87,7 +90,7 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 	m_Light = new LightClass;
 
 	// Initialize the light object.
-	m_Light->SetDiffuseColor(1,1, 1, 1);
+	m_Light->SetDiffuseColor(1, 1, 1, 1);
 	m_Light->SetDirection(0.0f, -1.0f, 0.0f);
 	m_Light->SetAmbientColor(1, 1, 1, 1);
 
@@ -124,12 +127,24 @@ void Game::Initialize(HWND window, HINSTANCE hInstance)
 
 	//	Floor/walls
 	temp = new BaseRenderer(0, "Assets/Models/Layout.obj", "Assets/Models/TrexTemp.dds", false, NULL, XMFLOAT3(0, 0, 0), "FloorWall");
+	temp->SetPosition(XMFLOAT3(0, 0, 0));
 	ObjectManager::GetInstance()->AddToContextListSort(0, temp);
 
 	ChangeState(MainMenu::GetInstance());
 	ShapeDebug::GetInstance()->Initialize();
 
 	m_SkyBox = new SkyBox();
+
+	LightManager::Getinstance()->SetLightShaderClass(m_LightShader);
+	LightManager::Getinstance()->SetDeferredBuffers(m_DeferredBuffer);
+
+	PointLight * TestPointLight = new PointLight(XMFLOAT4(.5f, .2f, 0, 1), XMFLOAT3(0, 2, 0), XMFLOAT3(0, 0, 0), 0, Pos);
+
+	//TestPointLight = new PointLight(XMFLOAT4(1, .2f, 0, 1), XMFLOAT3(0.1f, 0, 0), XMFLOAT3(0, 0, 0), 0, Pos);
+	//TestPointLight = new PointLight(XMFLOAT4(0, 1, 0, 1), XMFLOAT3(0.2f, 0, 0), XMFLOAT3(0, 0, 0), 0, Pos);
+	//TestPointLight = new PointLight(XMFLOAT4(0, .2f, .2f, 1), XMFLOAT3(-0.1f, 0, 0), XMFLOAT3(0, 0, 0), 0, Pos);
+	TestPointLight = new PointLight(XMFLOAT4(1, 0, 0, 1), XMFLOAT3(-1, 0, 2), XMFLOAT3(0, 0, 0), 0, Pos);
+	TestPointLight = new PointLight(XMFLOAT4(0, .2f, 1, 1), XMFLOAT3(1, 0, 0), XMFLOAT3(0, 0, 0), 0, Pos);
 	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
 	// e.g. for 60 FPS fixed timestep update logic, call:
 	/*
@@ -166,10 +181,6 @@ void Game::Update(DX::StepTimer const& timer)
 	float elapsedTime = float(timer.GetElapsedSeconds());
 
 	// TODO: Add your game logic here
-	//Camera update
-	m_Camera->Render();
-
-
 
 	//check keyboard state if any keys
 	InputClass::GetInstance()->Frame();
@@ -201,10 +212,13 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*elapsedTime);
 	}
-
+	//Camera update
+	m_Camera->Render();
 
 	//Updated all moveable object that have been added.
 	ObjectManager::GetInstance()->ObjectUpdate(elapsedTime);
+	LightManager::Getinstance()->Update(elapsedTime);
+	LightManager::Getinstance()->SetCameraPosition(m_Camera->GetPosition());
 	//	like name says
 	Render();
 }
@@ -251,6 +265,8 @@ void Game::RenderSceneToTexture()
 	//Loops throguh all game objects
 	ObjectManager::GetInstance()->ObjectRenderer(viewMatrix, projectionMatrix, m_DeferredShader);
 
+	// Renderer pointlight and other later
+	//LightManager::Getinstance()->Renderer(viewMatrix, projectionMatrix);
 
 	// Reset the render target back to the original back buffer and not the render buffers anymore.
 	DeferredRenderer::GetInstance()->SetBackBufferRenderTarget();
@@ -262,7 +278,7 @@ void Game::RenderSceneToTexture()
 // Presents the backbuffer contents to the screen
 void Game::Present()
 {
-	XMMATRIX worldMatrix, baseViewMatrix, orthoMatrix;
+	XMMATRIX worldMatrix, ViewMatrix, baseViewMatrix, orthoMatrix, projectionMatrix;
 
 	//
 	RenderSceneToTexture();
@@ -274,6 +290,16 @@ void Game::Present()
 	DeferredRenderer::GetInstance()->GetWorldMatrix(worldMatrix);
 	//get view matrix for quad
 	m_Camera->GetBaseViewMatrix(baseViewMatrix);
+
+
+	//Get View matrix for lights
+	m_Camera->GetViewMatrix(ViewMatrix);
+	//Get Projection for lights
+	DeferredRenderer::GetInstance()->GetProjectionMatrix(projectionMatrix);
+
+	// Renderer pointlight and other later
+	//LightManager::Getinstance()->Renderer(ViewMatrix,projectionMatrix);
+
 	//get GetOrthoMatrix
 	DeferredRenderer::GetInstance()->GetOrthoMatrix(orthoMatrix);
 	//Magic teehee
@@ -288,12 +314,17 @@ void Game::Present()
 	// Render the full screen ortho window using the deferred light shader and the render buffers.
 	m_LightShader->Render(DeferredRenderer::GetInstance()->GetDeviceContext(), m_QuadScreen->GetIndexCount(), worldMatrix, baseViewMatrix, orthoMatrix,
 		m_DeferredBuffer->GetShaderResourceView(0), m_DeferredBuffer->GetShaderResourceView(1),
-		m_Light->GetDirection(),m_Light->GetAmbientColor(),m_Light->GetDiffuseColor());
+		m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor());
+
+
+	DeferredRenderer::GetInstance()->TurnOnAddBlending();
+	// Renderer pointlight and other later
+	LightManager::Getinstance()->Renderer(ViewMatrix, projectionMatrix);
 
 	// Turn the Z buffer back on now that all 2D rendering has completed.
 	DeferredRenderer::GetInstance()->TurnZBufferOn();
 
-
+	DeferredRenderer::GetInstance()->TurnOFFaddBlending();
 
 	DeferredRenderer::GetInstance()->ShowScene();
 
@@ -364,6 +395,7 @@ void Game::ShutDown()
 	ObjectManager::GetInstance()->ShutDown();
 	DeferredRenderer::GetInstance()->Shutdown();
 	InputClass::GetInstance()->Shutdown();
+	LightManager::Getinstance()->ShutDown();
 	m_DeferredBuffer->Shutdown();
 	m_DeferredShader->Shutdown();
 	m_QuadScreen->Shutdown();

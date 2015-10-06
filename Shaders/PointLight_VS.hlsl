@@ -24,6 +24,7 @@ struct PixelInputType
 {
 	float4 position : SV_POSITION;
 	float4 pixelPosition : TEXCOORD0;
+	//float4 positionWP : WorldPos;
 };
 
 
@@ -37,6 +38,8 @@ PixelInputType main(VertexInputType input)
 
 	output.position.z = min(output.position.w, output.position.z);
 
+
+	//output.positionWP = mul(float4(input.position.xyz, 1), worldMatrix);
 	output.pixelPosition = output.position;
 
 	return output;

@@ -37,20 +37,20 @@ class ModelObject
 {
 	bool SaveObjectBinary(const char* fileName);
 	void LoadobjectBinary(const char* filePath);
-	bool InitializeBuffers(ID3D11Device* device);
+	bool InitializeBuffers(ID3D11Device* device, int Type);
 	void LoadTexture(string DDSLocation);
-
+	bool NormalFlip=false;
 public:
 	//CTOR & DTOR
 	ModelObject();
 	~ModelObject();
-	bool LoadObject(const char* filePath, const char *FileName, const char *DDSLocation); //load the model information from obj file
+	bool LoadObject(const char* filePath, const char *FileName, const char *DDSLocation, int Type); //load the model information from obj file
 	//vertex information
 	SIMPLE_VERTEX* vertexList;
 	unsigned int vertexCount;
-	
-	void RenderBuffers(ID3D11DeviceContext* deviceContext);
-	
+
+	void RenderBuffers(ID3D11DeviceContext* deviceContext, int Type);
+
 	//index information
 	UINT* indexList;
 	UINT indexCount;
@@ -60,7 +60,7 @@ public:
 	ID3D11ShaderResourceView * ShadeView;
 	ID3D11Resource * pBB;
 	void Shutdown();
-
+	void SetNormalFlip(bool t) { NormalFlip = t; }
 	map<string, pair<unsigned int, SIMPLE_VERTEX*>> indexBuffer;
 };
 

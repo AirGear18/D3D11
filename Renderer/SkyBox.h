@@ -1,9 +1,11 @@
 #pragma once
 class DeferredShader;
+#include "../ModelObject.h"
 
 class SkyBox
 {
 	XMMATRIX m_WorldMatrix;
+	ModelObject m_SkyBoxModel;
 public:
 	SkyBox();
 	~SkyBox();

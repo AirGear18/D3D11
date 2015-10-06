@@ -22,6 +22,8 @@ DeferredRenderer::DeferredRenderer()
 	m_depthDisabledStencilState = 0;
 	m_alphaEnableBlendingState = 0;
 	m_alphaDisableBlendingState = 0;
+	AddBlendingState = 0;
+	CCWcullMode = 0;
 }
 
 
@@ -266,6 +268,28 @@ bool DeferredRenderer::Initialize(int screenWidth, int screenHeight, bool vsync,
 		return false;
 	}
 
+	ZeroMemory(&rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
+	// Setup a raster description which turns off back face culling.
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.CullMode = D3D11_CULL_BACK;
+
+	rasterDesc.FrontCounterClockwise = true;
+	// Create the no culling rasterizer state.
+	result = m_device->CreateRasterizerState(&rasterDesc, &CCWcullMode);
+	if (FAILED(result))
+	{
+		assert(result <= 0 && "Failed to created no culling");
+		return false;
+	}
+	rasterDesc.FrontCounterClockwise = false;
+	// Create the no culling rasterizer state.
+	result = m_device->CreateRasterizerState(&rasterDesc, &CWcullMode);
+	if (FAILED(result))
+	{
+		assert(result <= 0 && "Failed to created no culling");
+		return false;
+	}
+
 	// Setup the viewport for rendering.
 	m_viewport.Width = (float)screenWidth;
 	m_viewport.Height = (float)screenHeight;
@@ -297,7 +321,7 @@ bool DeferredRenderer::Initialize(int screenWidth, int screenHeight, bool vsync,
 	// that DepthEnable is set to false, all other parameters are the same as the other depth stencil state.
 	depthDisabledStencilDesc.DepthEnable = false;
 	depthDisabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 	depthDisabledStencilDesc.StencilEnable = true;
 	depthDisabledStencilDesc.StencilReadMask = 0xFF;
 	depthDisabledStencilDesc.StencilWriteMask = 0xFF;
@@ -349,6 +373,22 @@ bool DeferredRenderer::Initialize(int screenWidth, int screenHeight, bool vsync,
 	{
 		return false;
 	}
+
+	// Clear the blend state description.
+	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
+
+	// Create an alpha enabled blend state description.
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	// Create the blend state using the description.
+	result = m_device->CreateBlendState(&blendStateDescription, &AddBlendingState);
 
 	return true;
 }
@@ -456,6 +496,15 @@ void DeferredRenderer::Shutdown()
 		indexBufferPtr->Release();
 		indexBufferPtr = 0;
 	}
+
+	if (AddBlendingState)
+		AddBlendingState->Release();
+
+	if (CCWcullMode)
+		CCWcullMode->Release();
+
+	if (CWcullMode)
+		CWcullMode->Release();
 }
 
 ID3D11Device* DeferredRenderer::GetDevice()
@@ -540,6 +589,32 @@ void DeferredRenderer::TurnOffAlphaBlending()
 	return;
 }
 
+void DeferredRenderer::TurnOnAddBlending()
+{
+	float blendFactor[4];
+
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	m_deviceContext->OMSetBlendState(AddBlendingState, blendFactor, 0xffffffff);
+}
+void DeferredRenderer::TurnOFFaddBlending()
+{
+	float blendFactor[4];
+
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	m_deviceContext->OMSetBlendState(NULL, blendFactor, 0xffffffff);
+}
 
 void DeferredRenderer::TurnOnCulling()
 {
@@ -630,4 +705,14 @@ UINT DeferredRenderer::AddIndices(const UINT *_indices, UINT _numIndices)
 		NewBuffer->Release();
 	}
 
+}
+
+void DeferredRenderer::TurnOnCCWcullMode()
+{
+	m_deviceContext->RSSetState(CCWcullMode);
+}
+
+void DeferredRenderer::TurnOnCWcullMode()
+{
+	m_deviceContext->RSSetState(CWcullMode);
 }
