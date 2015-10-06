@@ -7,7 +7,7 @@
 #include "../Renderer/DeferredShader.h"
 Player::Player()
 {
-	m_Model.LoadObject("Assets/Models/Trex2.obj", "Player", "Assets/Models/TrexTemp.dds");
+	m_Model.LoadObject("Assets/Models/Trex2.obj", "Player", "Assets/Models/TrexTemp.dds",0);
 	m_WorldMatrix = XMMatrixIdentity();
 	m_Movement = XMFLOAT3(0, 0, 0);
 	m_Position = XMFLOAT3(0, 0, 0);
@@ -68,7 +68,7 @@ void Player::Input()
 
 void Player::Renderer(XMMATRIX& ViewMatrix, XMMATRIX& projectionMatrix, DeferredShader * def)
 {
-	m_Model.RenderBuffers(DeferredRenderer::GetInstance()->GetDeviceContext());
+	m_Model.RenderBuffers(DeferredRenderer::GetInstance()->GetDeviceContext(),Posnormuv);
 	def->Render(DeferredRenderer::GetInstance()->GetDeviceContext(), m_Model.indexCount, m_WorldMatrix, ViewMatrix, projectionMatrix, m_Model.ShadeView, m_Model.StartPoint);
 
 }

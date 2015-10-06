@@ -165,10 +165,12 @@
     <ClInclude Include="Object\ObjectManager.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PlayerInfo\Player.h" />
+    <ClInclude Include="Renderer\BaseLight.h" />
     <ClInclude Include="Renderer\DeferredBuffers.h" />
     <ClInclude Include="Renderer\DeferredRenderer.h" />
     <ClInclude Include="Renderer\DeferredShader.h" />
     <ClInclude Include="Renderer\lightclass.h" />
+    <ClInclude Include="Renderer\LightManager.h" />
     <ClInclude Include="Renderer\lightshaderclass.h" />
     <ClInclude Include="Renderer\orthowindowclass.h" />
     <ClInclude Include="Renderer\PointLight.h" />
@@ -196,10 +198,12 @@
     <ClCompile Include="Object\ObjectManager.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PlayerInfo\Player.cpp" />
+    <ClCompile Include="Renderer\BaseLight.cpp" />
     <ClCompile Include="Renderer\DeferredBuffers.cpp" />
     <ClCompile Include="Renderer\DeferredRenderer.cpp" />
     <ClCompile Include="Renderer\DeferredShader.cpp" />
     <ClCompile Include="Renderer\lightclass.cpp" />
+    <ClCompile Include="Renderer\LightManager.cpp" />
     <ClCompile Include="Renderer\lightshaderclass.cpp" />
     <ClCompile Include="Renderer\orthowindowclass.cpp" />
     <ClCompile Include="Renderer\PointLight.cpp" />

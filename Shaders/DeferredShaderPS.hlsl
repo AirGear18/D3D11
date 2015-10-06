@@ -17,14 +17,16 @@ SamplerState SampleTypeWrap : register(s0);
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+	float2 tex : TEXCOORD0;
+	float2 depthDiv : TEXCOORD1;
 };
 
 struct PixelOutputType
 {
 	float4 color : SV_Target0;
 	float4 normal : SV_Target1;
+	float4 Depth : SV_Target2;
 };
 
 
@@ -41,9 +43,8 @@ PixelOutputType main(PixelInputType input)
 	output.color = shaderTexture.Sample(SampleTypeWrap, input.tex);
 
 	// Store the normal for output to the render target.
-	output.normal = float4((input.normal + 1)*.5f,0.0);
-
+	output.normal = float4((input.normal + 1)*.5f,1.0);
+	output.Depth = input.depthDiv.x / input.depthDiv.y;
 	
-
 	return output;
 }

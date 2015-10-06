@@ -20,8 +20,9 @@ struct VertexInputType
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+	float2 tex : TEXCOORD0;
+	float2 depthDiv : TEXCOORD1;
 };
 
 
@@ -38,7 +39,7 @@ PixelInputType main(VertexInputType input)
 	localH = mul(localH, viewMatrix);
 	localH = mul(localH, projectionMatrix);
 	output.position = localH;
-
+	output.depthDiv = output.position.zw;
 
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;

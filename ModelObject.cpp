@@ -14,6 +14,8 @@ ModelObject::ModelObject()
 {
 	vertexList = 0;
 	indexList = 0;
+	ShadeView = 0;
+	pBB = 0;
 }
 
 ModelObject::~ModelObject()
@@ -33,7 +35,7 @@ void ModelObject::Shutdown()
 }
 
 
-bool ModelObject::LoadObject(const char* filePath, const char *FileName, const char *DDSLocation)
+bool ModelObject::LoadObject(const char* filePath, const char *FileName, const char *DDSLocation, int Type)
 {
 	bool BinaryLoaded = false;
 	string BinaryFilePath("Assets/Binary");
@@ -61,8 +63,8 @@ bool ModelObject::LoadObject(const char* filePath, const char *FileName, const c
 		m_vertexBuffer = VertexBufferManager::GetInstance()->CheckVertexBuffers(filePath);
 		indexCount = VertexBufferManager::GetInstance()->GetIndexCount(filePath);
 		StartPoint = VertexBufferManager::GetInstance()->GetIndexStartPos(filePath);
-
-		LoadTexture(string(DDSLocation));
+		if (DDSLocation)
+			LoadTexture(string(DDSLocation));
 	}
 	else if (!infile.good())
 	{
@@ -262,8 +264,9 @@ bool ModelObject::LoadObject(const char* filePath, const char *FileName, const c
 		StartPoint = DeferredRenderer::GetInstance()->AddIndices(indexList, indexCount);
 
 		SaveObjectBinary(BinaryFilePath.c_str());
-		InitializeBuffers(DeferredRenderer::GetInstance()->GetDevice());
-		LoadTexture(string(DDSLocation));
+		InitializeBuffers(DeferredRenderer::GetInstance()->GetDevice(), Type);
+		if (DDSLocation != NULL)
+			LoadTexture(string(DDSLocation));
 
 		VertexBufferManager::GetInstance()->AddVertexBuffers(filePath, m_vertexBuffer, indexCount, StartPoint);
 	}
@@ -272,8 +275,9 @@ bool ModelObject::LoadObject(const char* filePath, const char *FileName, const c
 		LoadobjectBinary(BinaryFilePath.c_str());
 
 		StartPoint = DeferredRenderer::GetInstance()->AddIndices(indexList, indexCount);
-		InitializeBuffers(DeferredRenderer::GetInstance()->GetDevice());
-		LoadTexture(string(DDSLocation));
+		InitializeBuffers(DeferredRenderer::GetInstance()->GetDevice(), Type);
+		if (DDSLocation != NULL)
+			LoadTexture(string(DDSLocation));
 		VertexBufferManager::GetInstance()->AddVertexBuffers(filePath, m_vertexBuffer, indexCount, StartPoint);
 	}
 
@@ -317,77 +321,157 @@ bool ModelObject::SaveObjectBinary(const char* fileName)
 	return true;
 }
 
-bool ModelObject::InitializeBuffers(ID3D11Device* device)
+bool ModelObject::InitializeBuffers(ID3D11Device* device, int Type)
 {
-	VertexInputType* vertices;
+	VertexInputType* vertices = 0;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 	unsigned int i;
 
 
-	// Create the vertex array.
-	vertices = new VertexInputType[vertexCount];
-	if (!vertices)
+	switch (Type)
 	{
-		return false;
+	case Posnormuv:
+	{
+		// Create the vertex array.
+		vertices = new VertexInputType[vertexCount];
+		if (!vertices)
+		{
+			return false;
+		}
+
+		// Load the vertex array and index array with data.
+		for (i = 0; i < vertexCount; i++)
+		{
+			vertices[i].position = XMFLOAT4(vertexList[i].position.x, vertexList[i].position.y, vertexList[i].position.z, vertexList[i].position.w);
+
+			vertices[i].tex = XMFLOAT2(vertexList[i].uv.u, vertexList[i].uv.v);
+			if (NormalFlip == false)
+				vertices[i].normal = XMFLOAT3(vertexList[i].normal.x, vertexList[i].normal.y, vertexList[i].normal.z);
+			else
+				vertices[i].normal = XMFLOAT3(-vertexList[i].normal.x, -vertexList[i].normal.y, -vertexList[i].normal.z);
+		}
+
+		// Set up the description of the static vertex buffer.
+		vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		vertexBufferDesc.ByteWidth = sizeof(VertexInputType) * vertexCount;
+		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vertexBufferDesc.CPUAccessFlags = 0;
+		vertexBufferDesc.MiscFlags = 0;
+		vertexBufferDesc.StructureByteStride = 0;
+
+		// Give the subresource structure a pointer to the vertex data.
+		vertexData.pSysMem = vertices;
+		vertexData.SysMemPitch = 0;
+		vertexData.SysMemSlicePitch = 0;
+
+		// Now create the vertex buffer.
+		result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+	break;
+	case Pos:
+	{
+		// Create the vertex array.
+		VertexInputTypeSpotLight *vertices = new VertexInputTypeSpotLight[vertexCount];
+		if (!vertices)
+		{
+			return false;
+		}
+
+		// Load the vertex array and index array with data.
+		for (i = 0; i < vertexCount; i++)
+		{
+			vertices[i].position = XMFLOAT4(vertexList[i].position.x, vertexList[i].position.y, vertexList[i].position.z, vertexList[i].position.w);
+		}
+
+		// Set up the description of the static vertex buffer.
+		vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		vertexBufferDesc.ByteWidth = sizeof(VertexInputTypeSpotLight) * vertexCount;
+		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vertexBufferDesc.CPUAccessFlags = 0;
+		vertexBufferDesc.MiscFlags = 0;
+		vertexBufferDesc.StructureByteStride = 0;
+
+		// Give the subresource structure a pointer to the vertex data.
+		vertexData.pSysMem = vertices;
+		vertexData.SysMemPitch = 0;
+		vertexData.SysMemSlicePitch = 0;
+
+		// Now create the vertex buffer.
+		result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+		if (FAILED(result))
+		{
+			return false;
+		}
+		delete[] vertices;
+	}
+	break;
+	case PosUV:
+		break;
+	default:
+		break;
 	}
 
-	// Load the vertex array and index array with data.
-	for (i = 0; i < vertexCount; i++)
-	{
-		vertices[i].position = XMFLOAT4(vertexList[i].position.x, vertexList[i].position.y, vertexList[i].position.z, vertexList[i].position.w);
-		vertices[i].tex = XMFLOAT2(vertexList[i].uv.u, vertexList[i].uv.v);
-		vertices[i].normal = XMFLOAT3(vertexList[i].normal.x, vertexList[i].normal.y, vertexList[i].normal.z);
-	}
-
-	// Set up the description of the static vertex buffer.
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexInputType) * vertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
-
-	// Give the subresource structure a pointer to the vertex data.
-	vertexData.pSysMem = vertices;
-	vertexData.SysMemPitch = 0;
-	vertexData.SysMemSlicePitch = 0;
-
-	// Now create the vertex buffer.
-	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
 
 	// Release the arrays now that the vertex and index buffers have been created and loaded.
-	delete[] vertices;
+	if (vertices)
+		delete[] vertices;
 	vertices = 0;
 
 
 	return true;
 }
 
-void ModelObject::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void ModelObject::RenderBuffers(ID3D11DeviceContext* deviceContext, int Type)
 {
 	unsigned int stride;
 	unsigned int offset;
 
+	switch (Type)
+	{
+	case Posnormuv:
+	{
+		// Set vertex buffer stride and offset.
+		stride = sizeof(VertexInputType);
+		offset = 0;
 
-	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexInputType);
-	offset = 0;
+		// Set the vertex buffer to active in the input assembler so it can be rendered.
+		deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
-
-	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(DeferredRenderer::GetInstance()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		// Set the index buffer to active in the input assembler so it can be rendered.
+		deviceContext->IASetIndexBuffer(DeferredRenderer::GetInstance()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
 
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+	break;
+	case Pos:
+	{
+		// Set vertex buffer stride and offset.
+		stride = sizeof(VertexInputTypeSpotLight);
+		offset = 0;
+
+		// Set the vertex buffer to active in the input assembler so it can be rendered.
+		deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+
+		// Set the index buffer to active in the input assembler so it can be rendered.
+		deviceContext->IASetIndexBuffer(DeferredRenderer::GetInstance()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+
+		// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+	break;
+	default:
+		break;
+	}
+
 
 	return;
 }

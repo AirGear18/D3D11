@@ -5,12 +5,18 @@
 #include "lightshaderclass.h"
 #include "../DirectionalLightVS.csh"
 #include "../DirectionalLightPS.csh"
+#include "../PointLight_PS.csh"
+#include "../PointLight_VS.csh"
+#include "DeferredRenderer.h"
 
 LightShaderClass::LightShaderClass()
 {
-	m_vertexShader = 0;
-	m_pixelShader = 0;
-	m_layout = 0;
+	m_vertexShader[0] = 0;
+	m_vertexShader[1] = 0;
+	m_pixelShader[0] = 0;
+	m_pixelShader[1] = 0;
+	m_layout[0] = 0;
+	m_layout[1] = 0;
 	m_sampleState = 0;
 	m_matrixBuffer = 0;
 	m_lightBuffer = 0;
@@ -33,7 +39,7 @@ bool LightShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitializeShader(device, hwnd, L"../Engine/light.vs", L"../Engine/light.ps");
+	result = InitializeShader(device, hwnd);
 	if (!result)
 	{
 		return false;
@@ -60,7 +66,7 @@ bool LightShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
 
 
 	// Set the shader parameters that it will use for rendering.
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, colorTexture, normalTexture, lightDirection,ambientColor,diffuseColor);
+	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, colorTexture, normalTexture, lightDirection, ambientColor, diffuseColor);
 	if (!result)
 	{
 		return false;
@@ -73,7 +79,7 @@ bool LightShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
 }
 
 
-bool LightShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool LightShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd)
 {
 	HRESULT result;
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
@@ -85,20 +91,34 @@ bool LightShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 
 
 	// Create the vertex shader from the buffer.
-	result = device->CreateVertexShader(DirectionalLightVS, sizeof(DirectionalLightVS), NULL, &m_vertexShader);
+	result = device->CreateVertexShader(DirectionalLightVS, sizeof(DirectionalLightVS), NULL, &m_vertexShader[0]);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Create the pixel shader from the buffer.
-	result = device->CreatePixelShader(DirectionalLightPS, sizeof(DirectionalLightPS), NULL, &m_pixelShader);
+	result = device->CreatePixelShader(DirectionalLightPS, sizeof(DirectionalLightPS), NULL, &m_pixelShader[0]);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
-	
+	// Create the vertex shader from the buffer.
+	result = device->CreateVertexShader(PointLight_VS, sizeof(PointLight_VS), NULL, &m_vertexShader[1]);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Create the pixel shader from the buffer.
+	result = device->CreatePixelShader(PointLight_PS, sizeof(PointLight_PS), NULL, &m_pixelShader[1]);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+
 
 	// Create the vertex input layout description.
 	polygonLayout[0].SemanticName = "POSITION";
@@ -122,7 +142,11 @@ bool LightShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 
 	// Create the vertex input layout.
 	result = device->CreateInputLayout(polygonLayout, numElements, DirectionalLightVS, sizeof(DirectionalLightVS),
-		&m_layout);
+		&m_layout[0]);
+
+	result = device->CreateInputLayout(polygonLayout, 1, PointLight_VS, sizeof(PointLight_VS),
+		&m_layout[1]);
+
 	if (FAILED(result))
 	{
 		return false;
@@ -169,7 +193,7 @@ bool LightShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
 	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
+	lightBufferDesc.ByteWidth = sizeof(DirectionLightBufferType);
 	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	lightBufferDesc.MiscFlags = 0;
@@ -210,49 +234,55 @@ void LightShaderClass::ShutdownShader()
 	}
 
 	// Release the layout.
-	if (m_layout)
+	for (size_t i = 0; i < 2; i++)
 	{
-		m_layout->Release();
-		m_layout = 0;
+		if (m_layout[i])
+		{
+			m_layout[i]->Release();
+			m_layout[i] = 0;
+		}
+		// Release the pixel shader.
+		if (m_pixelShader[i])
+		{
+			m_pixelShader[i]->Release();
+			m_pixelShader[i] = 0;
+		}
+
+		// Release the vertex shader.
+		if (m_vertexShader[i])
+		{
+			m_vertexShader[i]->Release();
+			m_vertexShader[i] = 0;
+		}
 	}
 
-	// Release the pixel shader.
-	if (m_pixelShader)
-	{
-		m_pixelShader->Release();
-		m_pixelShader = 0;
-	}
 
-	// Release the vertex shader.
-	if (m_vertexShader)
-	{
-		m_vertexShader->Release();
-		m_vertexShader = 0;
-	}
+
 
 	return;
 }
 
-
-
+//
+// Reminder got remove this after i get lighting Manager up and running
+//
 bool LightShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX &worldMatrix, XMMATRIX &viewMatrix,
 	XMMATRIX &projectionMatrix, ID3D11ShaderResourceView* colorTexture,
-	ID3D11ShaderResourceView* normalTexture, XMFLOAT3 lightDirection, XMFLOAT4 ambientColor, XMFLOAT4 diffuseColor )
+	ID3D11ShaderResourceView* normalTexture, XMFLOAT3 lightDirection, XMFLOAT4 ambientColor, XMFLOAT4 diffuseColor)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	unsigned int bufferNumber;
 	MatrixBufferType* dataPtr;
-	LightBufferType* dataPtr2;
+	DirectionLightBufferType* dataPtr2;
 
 
 	// Transpose the matrices to prepare them for the shader.
 	//D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
-	worldMatrix = XMMatrixTranspose(worldMatrix);
+	//worldMatrix = XMMatrixTranspose(worldMatrix);
 	//D3DXMatrixTranspose(&viewMatrix, &viewMatrix);
-	viewMatrix = XMMatrixTranspose(viewMatrix);
+	//viewMatrix = XMMatrixTranspose(viewMatrix);
 	//D3DXMatrixTranspose(&projectionMatrix, &projectionMatrix);
-	projectionMatrix = XMMatrixTranspose(projectionMatrix);
+	//projectionMatrix = XMMatrixTranspose(projectionMatrix);
 
 	// Lock the constant buffer so it can be written to.
 	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -290,10 +320,10 @@ bool LightShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, X
 	}
 
 	// Get a pointer to the data in the constant buffer.
-	dataPtr2 = (LightBufferType*)mappedResource.pData;
+	dataPtr2 = (DirectionLightBufferType*)mappedResource.pData;
 
 	// Copy the lighting variables into the constant buffer.
-	dataPtr2->lightDirection = XMFLOAT4(lightDirection.x, lightDirection.y, lightDirection.z,0);
+	dataPtr2->lightDirection = XMFLOAT4(lightDirection.x, lightDirection.y, lightDirection.z, 0);
 	dataPtr2->m_ambientColor = ambientColor;
 	dataPtr2->m_diffuseColor = diffuseColor;
 	// Unlock the constant buffer.
@@ -309,20 +339,65 @@ bool LightShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, X
 }
 
 
+void LightShaderClass::RenderShader(int InputLayOut, int ShaderType)
+{
+	switch (InputLayOut)
+	{
+	case PosUV:
+	{
+		// Set the vertex input layout.
+		DeferredRenderer::GetInstance()->GetDeviceContext()->IASetInputLayout(m_layout[0]);
+	}
+	break;
+	case Pos:
+	{
+		// Set the vertex input layout.
+		DeferredRenderer::GetInstance()->GetDeviceContext()->IASetInputLayout(m_layout[1]);
+		//DeferredRenderer::GetInstance()->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	}
+	break;
+	default:
+		break;
+	}
+
+	switch (ShaderType)
+	{
+	case Pos:
+	{
+		DeferredRenderer::GetInstance()->GetDeviceContext()->VSSetShader(m_vertexShader[1], NULL, 0);
+		DeferredRenderer::GetInstance()->GetDeviceContext()->PSSetShader(m_pixelShader[1], NULL, 0);
+	}
+	break;
+	case PosUV:
+	{
+		DeferredRenderer::GetInstance()->GetDeviceContext()->VSSetShader(m_vertexShader[0], NULL, 0);
+		DeferredRenderer::GetInstance()->GetDeviceContext()->PSSetShader(m_pixelShader[0], NULL, 0);
+	}
+	break;
+	default:
+		break;
+	}
+
+	// Set the sampler state in the pixel shader.
+	DeferredRenderer::GetInstance()->GetDeviceContext()->PSSetSamplers(0, 1, &m_sampleState);
+
+
+
+}
+
 void LightShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
+
 	// Set the vertex input layout.
-	deviceContext->IASetInputLayout(m_layout);
+	deviceContext->IASetInputLayout(m_layout[0]);
 
 	// Set the vertex and pixel shaders that will be used to render.
-	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+	deviceContext->VSSetShader(m_vertexShader[0], NULL, 0);
+	deviceContext->PSSetShader(m_pixelShader[0], NULL, 0);
 
 	// Set the sampler state in the pixel shader.
 	deviceContext->PSSetSamplers(0, 1, &m_sampleState);
 
 	// Render the geometry.
 	deviceContext->DrawIndexed(indexCount, 0, 0);
-
-	return;
 }

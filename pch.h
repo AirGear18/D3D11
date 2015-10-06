@@ -49,7 +49,12 @@ struct VertexInputType
 	DirectX::XMFLOAT3 normal;
 };
 
+struct VertexInputTypeSpotLight
+{
+	DirectX::XMFLOAT4 position;
+};
+
 enum ContextType
 {
-	Posnormuv,poscolor,
+	Posnormuv, poscolor, Pos,PosUV
 };

@@ -12,7 +12,7 @@
 // Fourth : Offset it location from the attached location
 BaseRenderer::BaseRenderer(int ObjectType,const char *FilePath, const char * DDSLocation, bool AttachTo, BaseObject *ObjectToAttackTo, DirectX::XMFLOAT3 OffsetAttachLocation, const char * NameRendererObject)
 {
-	m_Model.LoadObject(FilePath, NameRendererObject, DDSLocation);
+	m_Model.LoadObject(FilePath, NameRendererObject, DDSLocation,Posnormuv);
 
 	//Model.LoadObject();
 	m_ObjectID = ObjectType;
@@ -46,6 +46,6 @@ void BaseRenderer::Update(float DeltaTime)
 }
 void BaseRenderer::Renderer(XMMATRIX& ViewMatrix, XMMATRIX&projectionMatrix, DeferredShader * def)
 {
-	m_Model.RenderBuffers(DeferredRenderer::GetInstance()->GetDeviceContext());
+	m_Model.RenderBuffers(DeferredRenderer::GetInstance()->GetDeviceContext(),Posnormuv);
 	def->Render(DeferredRenderer::GetInstance()->GetDeviceContext(),m_Model.indexCount,m_WorldMatrix,ViewMatrix,projectionMatrix,m_Model.ShadeView,m_Model.StartPoint );
 }
