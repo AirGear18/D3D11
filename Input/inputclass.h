@@ -42,19 +42,26 @@ public:
 	void Shutdown();
 	bool Frame();
 
-	void GetMouseLocation(int&, int&);
+	void GetMouseLocation(float&, float&);
 
 	bool IsEscapePressed();
 	bool IsLeftPressed();
 	bool IsRightPressed();
 	bool IsUpPressed();
 	bool IsDownPressed();
-	bool IsAPressed();
+
 	bool IsZPressed();
 	bool IsPgUpPressed();
 	bool IsPgDownPressed();
 	bool IsSpaceBarPressed();
-	//void RefToCam(CameraClass*);
+
+	//movement Keys
+	bool IsAPressed();
+	bool IsWPressed();
+	bool IsDPressed();
+	bool IsSPressed();
+
+	bool IsEnterPressed();
 
 private:
 	bool ReadKeyboard();
@@ -62,15 +69,15 @@ private:
 	void ProcessInput();
 
 private:
-	IDirectInput8* m_directInput=0;
-	IDirectInputDevice8* m_keyboard=0;
-	IDirectInputDevice8* m_mouse=0;
+	IDirectInput8* m_directInput = 0;
+	IDirectInputDevice8* m_keyboard = 0;
+	IDirectInputDevice8* m_mouse = 0;
 
 	unsigned char m_keyboardState[256];
 	DIMOUSESTATE m_mouseState;
 
 	int m_screenWidth, m_screenHeight;
-	int m_mouseX, m_mouseY;
+	float m_mouseX, m_mouseY;
 
 
 };

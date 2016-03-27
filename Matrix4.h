@@ -6,13 +6,13 @@ struct Matrix4
 public:
 	Matrix4(const Matrix4&);
 	Matrix4(const Vector4& X, const Vector4& Y, const Vector4& Z, const Vector4& W);
-	Matrix4(float _Xx = 1.f, float _Xy = 0.f, float _Xz = 0.f, float _Xw = 0.f, 
-			float _Yx = 0.f, float _Yy = 1.f, float _Yz = 0.f, float _Yw = 0.f, 
-			float _Zx = 0.f, float _Zy = 0.f, float _Zz = 1.f, float _Zw = 0.f, 
-			float _Wx = 0.f, float _Wy = 0.f, float _Wz = 0.f, float _Ww = 1.f);
+	Matrix4(float _Xx = 1.f, float _Xy = 0.f, float _Xz = 0.f, float _Xw = 0.f,
+		float _Yx = 0.f, float _Yy = 1.f, float _Yz = 0.f, float _Yw = 0.f,
+		float _Zx = 0.f, float _Zy = 0.f, float _Zz = 1.f, float _Zw = 0.f,
+		float _Wx = 0.f, float _Wy = 0.f, float _Wz = 0.f, float _Ww = 1.f);
 
 	~Matrix4() = default;
-	
+
 	Matrix4& operator=(const Matrix4&);
 	Matrix4 operator*(const Matrix4&) const;
 	void operator*=(const Matrix4&);
@@ -43,6 +43,8 @@ public:
 	void Scale(const Vector4&);
 	void Scale(float _x, float _y, float _z);
 
+	XMMATRIX ConvertToXMMatrix();
+
 	union
 	{
 		//matrix as a 2d array
@@ -65,5 +67,6 @@ public:
 			Vector4 WAxis;
 		};
 	};
+
 };
 

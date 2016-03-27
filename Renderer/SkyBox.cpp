@@ -127,7 +127,7 @@ SkyBox::SkyBox()
 		//Data.pSysMem = indices;
 		//Device->CreateBuffer(&Buff, &Data, &IndexCubeBuffer);
 		m_WorldMatrix = XMMatrixIdentity();
-		m_WorldMatrix = XMMatrixScaling(1, 1, 1);
+		m_WorldMatrix = XMMatrixScaling(10, 10, 10);
 
 		VertexBufferManager::GetInstance()->AddVertexBuffers("Box", m_vertex, 36, m_indiceStartLocation);
 	}

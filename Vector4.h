@@ -14,6 +14,7 @@ public:
 	Vector4 operator+(const Vector4&);
 	Vector4 operator-(const Vector4&);
 	Vector4 operator*(const Matrix4&) const;
+	Vector4 operator/(const Vector4&);
 
 	void operator+=(const Vector4&);
 	void operator-=(const Vector4&);
@@ -26,6 +27,9 @@ public:
 	Vector4& Normalize(void);
 	Vector4 Homogenize(void);
 	Vector4 Negate(void) const;
+
+	static float Dot_Product(const Vector4& VectorA,const Vector4& VectorB);
+
 	float ComputeMagnitude(void) const;
 	
 	static Vector4 CrossProduct(const Vector4& a, const Vector4& b);

@@ -9,7 +9,7 @@ class EventID
 public:
 	EventID(const char *);
 	~EventID();
-	int ID;
+	std::string ID;
 private:
 
 

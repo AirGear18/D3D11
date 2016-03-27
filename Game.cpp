@@ -168,6 +168,7 @@ void Game::Tick()
 		Update(m_timer);
 
 		float elapsedTime = float(m_timer.GetElapsedSeconds());
+		m_pCurrState->Input();
 		m_pCurrState->Update(elapsedTime);
 		m_pCurrState->Render();
 		int x = m_timer.GetFramesPerSecond();
@@ -179,8 +180,11 @@ void Game::Tick()
 void Game::Update(DX::StepTimer const& timer)
 {
 	float elapsedTime = float(timer.GetElapsedSeconds());
-
+	m_Camera->SetDeltaTime(elapsedTime);
 	// TODO: Add your game logic here
+
+	//Test Cam movement
+	XMFLOAT3 Movement = XMFLOAT3(0, 0, 0);
 
 	//check keyboard state if any keys
 	InputClass::GetInstance()->Frame();
@@ -188,6 +192,7 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		GameRunning = false;
 	}
+
 	if (InputClass::GetInstance()->IsPgUpPressed())
 	{
 		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y + (10)*elapsedTime, m_Camera->GetPosition().z);
@@ -198,20 +203,26 @@ void Game::Update(DX::StepTimer const& timer)
 	}
 	if (InputClass::GetInstance()->IsLeftPressed())
 	{
-		m_Camera->SetRotation(m_Camera->GetRotation().x, m_Camera->GetRotation().y - (1)*elapsedTime, m_Camera->GetRotation().z);
+		Movement.x -= (10)*elapsedTime;
+		//m_Camera->SetRotation(m_Camera->GetRotation().x, m_Camera->GetRotation().y - (1)*elapsedTime, m_Camera->GetRotation().z);
 	}
 	if (InputClass::GetInstance()->IsRightPressed())
 	{
-		m_Camera->SetRotation(m_Camera->GetRotation().x, m_Camera->GetRotation().y + (1)*elapsedTime, m_Camera->GetRotation().z);
+		Movement.x += (10)*elapsedTime;
+		//m_Camera->SetRotation(m_Camera->GetRotation().x, m_Camera->GetRotation().y + (1)*elapsedTime, m_Camera->GetRotation().z);
 	}
 	if (InputClass::GetInstance()->IsDownPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z - (10)*elapsedTime);
+		Movement.z -= (10)*elapsedTime;
+		//m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z - (10)*elapsedTime);
 	}
 	if (InputClass::GetInstance()->IsUpPressed())
 	{
-		m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*elapsedTime);
+		Movement.z += (10)*elapsedTime;
+		//m_Camera->SetPosition(m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z + (10)*elapsedTime);
 	}
+	m_Camera->Move(Movement);
+	//m_Camera->Movement();
 	//Camera update
 	m_Camera->Render();
 
@@ -239,9 +250,6 @@ void Game::Render()
 void Game::Clear()
 {
 	// Clear the views
-	//m_d3dContext->ClearRenderTargetView(m_renderTargetView.Get(), Colors::CornflowerBlue);
-	//m_d3dContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-	//m_d3dContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), m_depthStencilView.Get());
 }
 
 //This where all the stuff get renderer but you dont see it yet.
@@ -260,13 +268,10 @@ void Game::RenderSceneToTexture()
 	//TODO: Place renderer object here to renderer to buffers
 
 	//Rendere SKyBox first.
-	m_SkyBox->Renderer(viewMatrix, projectionMatrix, m_DeferredShader);
+	//m_SkyBox->Renderer(viewMatrix, projectionMatrix, m_DeferredShader);
 
 	//Loops throguh all game objects
 	ObjectManager::GetInstance()->ObjectRenderer(viewMatrix, projectionMatrix, m_DeferredShader);
-
-	// Renderer pointlight and other later
-	//LightManager::Getinstance()->Renderer(viewMatrix, projectionMatrix);
 
 	// Reset the render target back to the original back buffer and not the render buffers anymore.
 	DeferredRenderer::GetInstance()->SetBackBufferRenderTarget();
@@ -291,14 +296,10 @@ void Game::Present()
 	//get view matrix for quad
 	m_Camera->GetBaseViewMatrix(baseViewMatrix);
 
-
 	//Get View matrix for lights
 	m_Camera->GetViewMatrix(ViewMatrix);
 	//Get Projection for lights
 	DeferredRenderer::GetInstance()->GetProjectionMatrix(projectionMatrix);
-
-	// Renderer pointlight and other later
-	//LightManager::Getinstance()->Renderer(ViewMatrix,projectionMatrix);
 
 	//get GetOrthoMatrix
 	DeferredRenderer::GetInstance()->GetOrthoMatrix(orthoMatrix);
@@ -380,10 +381,6 @@ void Game::CreateDevice()
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateResources()
 {
-
-
-
-
 	// TODO: Initialize windows-size dependent objects here
 }
 

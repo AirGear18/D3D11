@@ -53,6 +53,7 @@ float4 main(PixelInputType input) : SV_TARGET
 	// Sample the normals from the normal render texture using the point sampler at this texture coordinate location.
 	normals = normalTexture.Sample(SampleTypePoint, input.tex);
 	normals = (normals * 2) - 1;
+	//return normals;
 	// Invert the light direction for calculations.
 	//lightDir = -lightDirection;
 	nDotL = saturate(dot(normals, -lightDirection));
