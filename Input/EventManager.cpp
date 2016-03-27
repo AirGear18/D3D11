@@ -23,7 +23,6 @@ void EventManager::AddEvent(BaseObject*obj, const char *name)
 	auto it = Events.find(obj);
 	if (it != Events.end())
 	{
-
 		for (size_t i = 0; i < it->second.size(); i++)
 		{
 			if (it->second[i].ID == temp.ID)
@@ -43,15 +42,7 @@ void EventManager::AddEvent(BaseObject*obj, const char *name)
 
 EventID::EventID(const char *Name)
 {
-	int temp = 0, i = 0;
-	while (true)
-	{
-		if (temp == '\n')
-			break;
-		temp += Name[i];
-		i++;
-	}
-	ID = temp;
+	ID = Name;
 }
 
 EventID::~EventID()

@@ -138,6 +138,9 @@
     <ClInclude Include="Renderer\BaseLight.h">
       <Filter>Renderer\Lights</Filter>
     </ClInclude>
+    <ClInclude Include="DebugStuff\CollisionLibrary.h">
+      <Filter>Debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -226,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="Renderer\BaseLight.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugStuff\CollisionLibrary.cpp">
+      <Filter>Debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

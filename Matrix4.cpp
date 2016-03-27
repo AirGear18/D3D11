@@ -142,7 +142,7 @@ Matrix4 Matrix4::Inverse(void) const
 	Matrix4 m(*this);
 	//copy position vector
 	Vector4 pos = m.WAxis;
-	m.WAxis = {0,0,0,1};
+	m.WAxis = { 0, 0, 0, 1 };
 	//transpose
 	m = m.Transpose();
 	//multiply by the matrix
@@ -246,3 +246,13 @@ void Matrix4::Scale(float _x, float _y, float _z)
 	Zz *= _z;
 }
 
+XMMATRIX Matrix4::ConvertToXMMatrix()
+{
+	XMFLOAT4X4 temp;
+	memcpy(&temp, this, sizeof(float) * 16);
+	//temp._44 = 1;
+	temp._43 = -temp._43;
+	temp._42 = -temp._42;
+	temp._41 = -temp._41;
+	return XMLoadFloat4x4(&temp);
+}

@@ -231,7 +231,7 @@ void InputClass::ProcessInput()
 }
 
 
-void InputClass::GetMouseLocation(int& mouseX, int& mouseY)
+void InputClass::GetMouseLocation(float& mouseX, float& mouseY)
 {
 	mouseX = m_mouseX;
 	mouseY = m_mouseY;
@@ -301,19 +301,6 @@ bool InputClass::IsDownPressed()
 	return false;
 }
 
-
-bool InputClass::IsAPressed()
-{
-	// Do a bitwise and on the keyboard state to check if the key is currently being pressed.
-	if(m_keyboardState[DIK_A] & 0x80)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-
 bool InputClass::IsZPressed()
 {
 	// Do a bitwise and on the keyboard state to check if the key is currently being pressed.
@@ -352,6 +339,56 @@ bool InputClass::IsPgDownPressed()
 bool InputClass::IsSpaceBarPressed()
 {
 	if (m_keyboardState[DIK_SPACE] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputClass::IsAPressed()
+{
+	if (m_keyboardState[DIK_A] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputClass::IsWPressed()
+{
+	if (m_keyboardState[DIK_W] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputClass::IsDPressed()
+{
+	if (m_keyboardState[DIK_D] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputClass::IsSPressed()
+{
+	if (m_keyboardState[DIK_S] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool InputClass::IsEnterPressed()
+{
+	if (m_keyboardState[DIK_RETURN] & 0x80)
 	{
 		return true;
 	}

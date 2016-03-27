@@ -45,6 +45,6 @@ PixelOutputType main(PixelInputType input)
 	// Store the normal for output to the render target.
 	output.normal = float4((input.normal + 1)*.5f,1.0);
 	output.Depth = input.depthDiv.x / input.depthDiv.y;
-	
+	output.Depth.w = 1.0f;
 	return output;
 }

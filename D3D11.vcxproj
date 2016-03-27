@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="Camera\cameraclass.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="DebugStuff\CollisionLibrary.h" />
     <ClInclude Include="DebugStuff\ShapeDebug.h" />
     <ClInclude Include="Definds.h" />
     <ClInclude Include="Game.h" />
@@ -185,6 +186,7 @@
   <ItemGroup>
     <ClCompile Include="Camera\cameraclass.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="DebugStuff\CollisionLibrary.cpp" />
     <ClCompile Include="DebugStuff\ShapeDebug.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameStates\MainMenu.cpp" />

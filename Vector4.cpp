@@ -58,6 +58,18 @@ void Vector4::operator+=(const Vector4& v)
 	z += v.z;
 	w += v.w;
 }
+
+Vector4 Vector4::operator / (const Vector4& v)
+{
+	Vector4 a;
+	a.x = x / v.x;
+	a.y = y / v.y;
+	a.z = z / v.z;
+	a.w = w / v.w;
+
+	return a;
+}
+
 void Vector4::operator-=(const Vector4& v)
 {
 	x -= v.x;
@@ -149,3 +161,7 @@ Vector4 Vector4::CrossProduct(const Vector4& b) const
 
 }
 
+float Vector4::Dot_Product(const Vector4& vectorA, const Vector4& vectorB)
+{
+	return vectorA.x*vectorB.x + vectorA.y*vectorB.y + vectorA.z*vectorB.z + vectorA.w*vectorB.w;
+}
